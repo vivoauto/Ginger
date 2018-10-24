@@ -87,7 +87,13 @@ namespace GingerCore.Drivers.WindowsLib
         {
             return null;
         }
-
+       public static new  Type DriverType
+        {
+            get
+            {
+                return typeof(WindowsDriver);
+            }
+        }
         public override void RunAction(Act act)
         {
             //TODO: add func to Act + Enum for switch

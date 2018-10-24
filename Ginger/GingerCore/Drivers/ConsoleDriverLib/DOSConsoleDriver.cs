@@ -84,7 +84,13 @@ namespace GingerCore.Drivers.ConsoleDriverLib
             WriteOutputsToConsole();
             return true;
         }
-
+       public static new  Type DriverType
+        {
+            get
+            {
+                return typeof(DOSConsoleDriver);
+            }
+        }
         public override void Disconnect()
         {
             // TODO: kill processStartInfo.

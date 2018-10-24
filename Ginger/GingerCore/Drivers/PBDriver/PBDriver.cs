@@ -57,7 +57,13 @@ namespace GingerCore.Drivers.PBDriver
         public PBDriver()
         {
         }
-
+       public static new  Type DriverType
+        {
+            get
+            {
+                return typeof(PBDriver);
+            }
+        }
         public PBDriver(BusinessFlow BF, eUIALibraryType type = eUIALibraryType.ComWrapper)
         {
             BusinessFlow = BF;

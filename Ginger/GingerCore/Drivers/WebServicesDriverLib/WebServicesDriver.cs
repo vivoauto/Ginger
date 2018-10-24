@@ -130,8 +130,15 @@ namespace GingerCore.Drivers.WebServicesDriverLib
         {
             return ShowDriverWindowOnLaunch;
         }
+       public static new  Type DriverType
+        {
+            get
+            {
+                return typeof(WebServicesDriver);
+            }
+        }
 
-        public WebServicesDriver(BusinessFlow BF)
+        public WebServicesDriver(eDriverSubtype DriverSubType,BusinessFlow BF)
         {
             BusinessFlow = BF;
         }

@@ -44,7 +44,8 @@ namespace GingerCore.Drivers
             set
             { }
         }
-
+        public eDriverMessageType DriverSubtype;
+        public enum eDriverSubtype { }
         public string ErrorMessageFromDriver { get; set; }
 
         //If this is WPF Window like IB, or Device/Mobile, Unix need to run on it's own STA
@@ -88,7 +89,7 @@ namespace GingerCore.Drivers
 
         // running an action on the UI
         public abstract void RunAction(Act act);
-
+        public static Type DriverType { get;}
 
         // UI Inspector
 

@@ -78,7 +78,13 @@ namespace GingerCore.Drivers.ConsoleDriverLib
         {
             mScriptsFolder = FolderPath;
         }
-
+       public static new  Type DriverType
+        {
+            get
+            {
+                return typeof(UnixShellDriver);
+            }
+        }
         public override bool Connect()
         {
             return ConnectToUnix();

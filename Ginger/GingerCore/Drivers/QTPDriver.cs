@@ -21,6 +21,7 @@ using System.Threading.Tasks;
 using GingerCore.Actions;
 using System.Threading;
 using GingerCoreNET.SolutionRepositoryLib.RepositoryObjectsLib.PlatformsLib;
+using System;
 
 namespace GingerCore.Drivers
 {
@@ -36,7 +37,13 @@ namespace GingerCore.Drivers
         {
             StartQTP();
         }
-
+       public static new  Type DriverType
+        {
+            get
+            {
+                return typeof(QTPDriver);
+            }
+        }
         public void StartQTP()
         {
             //TODO: maybe better to run a .bat file

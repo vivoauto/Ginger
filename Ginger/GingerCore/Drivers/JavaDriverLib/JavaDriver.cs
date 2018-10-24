@@ -85,7 +85,13 @@ namespace GingerCore.Drivers.JavaDriverLib
         {
             return true;
         }
-
+       public static new  Type DriverType
+        {
+            get
+            {
+                return typeof(JavaDriver);
+            }
+        }
         public JavaDriver(BusinessFlow BF)
         {
             BusinessFlow = BF;

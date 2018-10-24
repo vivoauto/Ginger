@@ -95,7 +95,13 @@ namespace GingerCore.Drivers.MainFrame
         {
             return false;
         }
-
+       public static new  Type DriverType
+        {
+            get
+            {
+                return typeof(MainFrameDriver);
+            }
+        }
         public static partial class Fields
         {
             public static readonly string CaretIndex = "CaretIndex";

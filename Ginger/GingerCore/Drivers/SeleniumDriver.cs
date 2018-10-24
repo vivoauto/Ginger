@@ -56,7 +56,9 @@ namespace GingerCore.Drivers
 {
     public class SeleniumDriver : DriverBase, IWindowExplorer, IVisualTestingDriver, IXPath, IPOM
     {
-        public enum eBrowserType
+
+     
+        public new enum eDriverSubtype
         {
             IE,
             FireFox,
@@ -163,7 +165,8 @@ namespace GingerCore.Drivers
         public String ApplitoolsViewKey { get; set; }
 
         protected IWebDriver Driver;
-        protected eBrowserType mBrowserTpe;
+        [IsSerializedForLocalRepository]
+        public eDriverSubtype mBrowserTpe;
         protected NgWebDriver ngDriver;
         private String DefaultWindowHandler = null;
 
@@ -203,16 +206,23 @@ namespace GingerCore.Drivers
             }
         }
 
-        public SeleniumDriver(eBrowserType BrowserType)
+        public SeleniumDriver(string BrowserType,BusinessFlow BF)
         {
-            mBrowserTpe = BrowserType;
+            Enum.TryParse<eDriverSubtype>(BrowserType,out mBrowserTpe);
+           // mBrowserTpe = BrowserType;
         }
 
         public SeleniumDriver(object driver)
         {
             this.Driver = (IWebDriver)driver;
         }
-
+       public static new  Type DriverType
+        {
+            get
+            {
+                return typeof(SeleniumDriver);
+            }
+        }
         public override void StartDriver()
         {
             if (StartBMP)
@@ -265,7 +275,7 @@ namespace GingerCore.Drivers
                 switch (mBrowserTpe)
                 {
                     //TODO: refactor closing the extra tabs
-                    case eBrowserType.IE:
+                    case eDriverSubtype.IE:
                         InternetExplorerOptions ieoptions = new InternetExplorerOptions();
 
                         ieoptions.EnsureCleanSession = true;
@@ -309,7 +319,7 @@ namespace GingerCore.Drivers
                         }
                         break;
 
-                    case eBrowserType.FireFox:
+                    case eDriverSubtype.FireFox:
                         string geckoDriverExePath2 = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + @"\geckodriver.exe";
                         System.Environment.SetEnvironmentVariable("webdriver.gecko.driver", geckoDriverExePath2, EnvironmentVariableTarget.Process);
 
@@ -375,7 +385,7 @@ namespace GingerCore.Drivers
                 
                         break;
 
-                    case eBrowserType.Chrome:
+                    case eDriverSubtype.Chrome:
                         ChromeOptions options = new ChromeOptions();
                         options.AddArgument("--start-maximized");
                         if (!string.IsNullOrEmpty(UserProfileFolderPath) && System.IO.Directory.Exists(UserProfileFolderPath))
@@ -401,7 +411,7 @@ namespace GingerCore.Drivers
                         }
                         break;
 
-                    case eBrowserType.Edge:
+                    case eDriverSubtype.Edge:
                         if (Convert.ToInt32(HttpServerTimeOut) > 60)
                         {
                             EdgeDriverService service = EdgeDriverService.CreateDefaultService();
@@ -413,14 +423,14 @@ namespace GingerCore.Drivers
                         }
                         break;
 
-                    case eBrowserType.PhantomJS:
+                    case eDriverSubtype.PhantomJS:
                         string PhantomJSServerPath = Path.Combine(General.GetGingerEXEPath(), @"Drivers\PhantomJS");
                         Driver = new PhantomJSDriver(PhantomJSServerPath);
                         break;
 
                     //TODO: add Safari
 
-                    case eBrowserType.RemoteWebDriver:
+                    case eDriverSubtype.RemoteWebDriver:
                         if (RemoteBrowserName.Equals("internet explorer"))
                         {
                             ieoptions = new InternetExplorerOptions();
@@ -4497,7 +4507,7 @@ namespace GingerCore.Drivers
                 }
                 catch (Exception ex)
                 {
-                    if (mBrowserTpe == eBrowserType.FireFox && ex.Message != null && ex.Message.Contains("did not match a known command"))
+                    if (mBrowserTpe == eDriverSubtype.FireFox && ex.Message != null && ex.Message.Contains("did not match a known command"))
                     {
                         continue;
                     }

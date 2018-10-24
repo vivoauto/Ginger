@@ -44,7 +44,13 @@ namespace GingerCore.Drivers.InternalBrowserLib
         {
             return true;
         }
-
+       public static new  Type DriverType
+        {
+            get
+            {
+                return typeof(InternalBrowser);
+            }
+        }
         public InternalBrowser(BusinessFlow BF)
         {            
             BusinessFlow = BF;            

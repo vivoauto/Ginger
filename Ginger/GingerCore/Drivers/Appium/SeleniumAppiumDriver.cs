@@ -49,7 +49,13 @@ namespace GingerCore.Drivers.Appium
         {
             return true;
         }
-
+       public static new  Type DriverType
+        {
+            get
+            {
+                return typeof(SeleniumAppiumDriver);
+            }
+        }
         public enum eDeviceType
         {
             Phone = 0,

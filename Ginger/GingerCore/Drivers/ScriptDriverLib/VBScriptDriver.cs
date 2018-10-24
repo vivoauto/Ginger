@@ -83,7 +83,13 @@ namespace GingerCore.Drivers.ScriptDriverLib
         }
 
         public override ePlatformType Platform { get { return ePlatformType.VBScript; } }
-        
+       public static new  Type DriverType
+        {
+            get
+            {
+                return typeof(VBScriptDriver);
+            }
+        }
         public override bool IsRunning()
         {
             return true;

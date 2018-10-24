@@ -66,6 +66,13 @@ namespace GingerCore.Drivers.Mobile.Perfecto {
         public PerfectoDriver(BusinessFlow BF) {
             BusinessFlow = BF;
         }
+       public static new  Type DriverType
+        {
+            get
+            {
+                return typeof(PerfectoDriver);
+            }
+        }
 
         public override void StartDriver() {
             ConnectedToDevice = ConnectToPerfecto();

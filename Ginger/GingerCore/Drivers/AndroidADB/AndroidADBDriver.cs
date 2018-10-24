@@ -59,7 +59,13 @@ namespace GingerCore.Drivers.AndroidADB
         {
             return true;
         }
-
+       public static new  Type DriverType
+        {
+            get
+            {
+                return typeof(AndroidADBDriver);
+            }
+        }
         public enum eSwipeSide
         {
             Up, Down, Left, Right

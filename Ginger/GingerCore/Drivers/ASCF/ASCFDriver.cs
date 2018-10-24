@@ -80,7 +80,13 @@ namespace GingerCore.Drivers.ASCF
             BusinessFlow = BF;
             mAgentName = AgentName;
         }
-
+        public static new  Type DriverType
+        {
+            get
+            {
+                return typeof(ASCFDriver);
+            }
+        }
         public override bool IsWindowExplorerSupportReady()
         {
             return true;
