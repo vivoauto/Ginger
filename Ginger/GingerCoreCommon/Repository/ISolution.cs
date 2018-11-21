@@ -22,5 +22,7 @@ namespace Amdocs.Ginger.Repository
     {
         string Name { get; set; }
         string Folder { get; set; }
+
+        ISolution LoadSolution(string solutionFile, bool v);
     }
 }

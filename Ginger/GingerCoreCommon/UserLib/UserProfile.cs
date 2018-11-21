@@ -1,4 +1,4 @@
-#region License
+﻿#region License
 /*
 Copyright © 2014-2018 European Support Limited
 
@@ -16,21 +16,16 @@ limitations under the License.
 */
 #endregion
 
-using amdocs.ginger.GingerCoreNET;
-using Amdocs.Ginger.Common;
-using Amdocs.Ginger.Repository;
-using Ginger.SolutionGeneral;
-using Ginger.UserConfig;
-using GingerCore;
-using GingerCore.Platforms;
-using GingerCoreNET.SolutionRepositoryLib.RepositoryObjectsLib.PlatformsLib;
-using GingerCoreNET.SourceControl;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using Amdocs.Ginger.Common;
+using Amdocs.Ginger.Repository;
+using Ginger.UserConfig;
+using GingerCoreNET.SolutionRepositoryLib.RepositoryObjectsLib.PlatformsLib;
+using Newtonsoft.Json.Linq;
 
 namespace Ginger
 {
@@ -96,9 +91,9 @@ namespace Ginger
 
         public string LocalWorkingFolder { get; set; }
 
-        public Solution mSolution { get; set; }
+        public ISolution mSolution { get; set; }
 
-        public Solution Solution
+        public ISolution Solution
         {
             get { return mSolution; }
             set
@@ -161,12 +156,12 @@ namespace Ginger
             }
             catch (Exception ex)
             {
-                Reporter.ToLog(eAppReporterLogLevel.ERROR, "Failed to do Recent Solutions list clean up", ex);
+                AppReporter.ToLog(eAppReporterLogLevel.ERROR, "Failed to do Recent Solutions list clean up", ex);
             }
         }
 
-        private ObservableList<Solution> mRecentSolutionsAsObjects = null;
-        public ObservableList<Solution> RecentSolutionsAsObjects
+        private ObservableList<ISolution> mRecentSolutionsAsObjects = null;
+        public ObservableList<ISolution> RecentSolutionsAsObjects
         {
             get
             {
@@ -187,7 +182,7 @@ namespace Ginger
 
             CleanRecentSolutionsList();
 
-            mRecentSolutionsAsObjects = new ObservableList<Solution>();
+            mRecentSolutionsAsObjects = new ObservableList<ISolution>();
             int counter = 0;
             foreach (string s in RecentSolutions)
             {
@@ -196,12 +191,12 @@ namespace Ginger
                 {
                     try
                     {
-                        Solution sol = Solution.LoadSolution(SolutionFile, false);
+                        ISolution sol = Solution.LoadSolution(SolutionFile, false);
                         mRecentSolutionsAsObjects.Add(sol);
                     }
                     catch (Exception ex)
                     {
-                        Reporter.ToLog(eAppReporterLogLevel.ERROR, string.Format("Failed to load the recent solution which in path '{0}'", s), ex);
+                        AppReporter.ToLog(eAppReporterLogLevel.ERROR, string.Format("Failed to load the recent solution which in path '{0}'", s), ex);
                     }
 
                     counter++;
@@ -215,14 +210,14 @@ namespace Ginger
             return;
         }
 
-        public void AddSolutionToRecent(Solution loadedSolution)
+        public void AddSolutionToRecent(ISolution loadedSolution)
         {
             //remove existing similar folder path
             string solPath = RecentSolutions.Where(x => SolutionRepository.NormalizePath(x) == SolutionRepository.NormalizePath(loadedSolution.Folder)).FirstOrDefault();
             if (solPath != null)
             {
                 RecentSolutions.Remove(solPath);
-                Solution sol = mRecentSolutionsAsObjects.Where(x => SolutionRepository.NormalizePath(x.Folder) == SolutionRepository.NormalizePath(loadedSolution.Folder)).FirstOrDefault();
+                ISolution sol = mRecentSolutionsAsObjects.Where(x => SolutionRepository.NormalizePath(x.Folder) == SolutionRepository.NormalizePath(loadedSolution.Folder)).FirstOrDefault();
                 if (sol != null)
                 {
                     mRecentSolutionsAsObjects.Remove(sol);
@@ -402,7 +397,7 @@ namespace Ginger
             {
                 SaveRecentAppAgentsMapping();
             }
-            catch (Exception ex) { Reporter.ToLog(eAppReporterLogLevel.ERROR, $"Method - {MethodBase.GetCurrentMethod().Name}, Error - {ex.Message}", ex); }
+            catch (Exception ex) { AppReporter.ToLog(eAppReporterLogLevel.ERROR, $"Method - {MethodBase.GetCurrentMethod().Name}, Error - {ex.Message}", ex); }
             
             RepositorySerializer.SaveToFile(this, UserProfileFilePath);
         }
@@ -499,7 +494,7 @@ namespace Ginger
                 try
                 {
                     DateTime UserProfileDT = File.GetLastWriteTime(UserProfileFilePath);
-                    Reporter.ToLog(eAppReporterLogLevel.INFO, string.Format("Loading existing User Profile at '{0}'", UserProfileFilePath));
+                    AppReporter.ToLog(eAppReporterLogLevel.INFO, string.Format("Loading existing User Profile at '{0}'", UserProfileFilePath));
                     string userProfileTxt = File.ReadAllText(UserProfileFilePath);
                     UserProfile up = (UserProfile)NewRepositorySerializer.DeserializeFromText(userProfileTxt);
                     up.FilePath = UserProfileFilePath;                 
@@ -514,11 +509,11 @@ namespace Ginger
                 }
                 catch (Exception ex)
                 {
-                    Reporter.ToLog(eAppReporterLogLevel.ERROR, string.Format("Failed to load the existing User Profile at '{0}'", UserProfileFilePath), ex);
+                    AppReporter.ToLog(eAppReporterLogLevel.ERROR, string.Format("Failed to load the existing User Profile at '{0}'", UserProfileFilePath), ex);
                 }
             }
 
-            Reporter.ToLog(eAppReporterLogLevel.INFO, "Creating new User Profile");
+            AppReporter.ToLog(eAppReporterLogLevel.INFO, "Creating new User Profile");
 
             UserProfile up2 = new UserProfile();
             up2.LoadDefaults();

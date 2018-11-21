@@ -944,7 +944,6 @@
     <Compile Include="UserControlsLib\TwoLevelMenuLib\SubMenuItem.cs" />
     <Compile Include="UserControlsLib\TwoLevelMenuLib\TopMenuItem.cs" />
     <Compile Include="UserControlsLib\TwoLevelMenuLib\TwoLevelMenu.cs" />
-    <Compile Include="UserConfig\UserTypeHelper.cs" />
     <Compile Include="UserControlsLib\ActionInputValueUserControlLib\ActionInputValueUserControl.xaml.cs">
       <DependentUpon>ActionInputValueUserControl.xaml</DependentUpon>
     </Compile>
@@ -1938,7 +1937,6 @@
       <DependentUpon>ucGrid.xaml</DependentUpon>
     </Compile>
     <Compile Include="UserControlsLib\UIHelpers.cs" />
-    <Compile Include="User\UserProfile.cs" />
     <Compile Include="Variables\AddVariablePage.xaml.cs">
       <DependentUpon>AddVariablePage.xaml</DependentUpon>
     </Compile>

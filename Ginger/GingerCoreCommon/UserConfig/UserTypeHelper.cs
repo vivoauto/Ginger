@@ -1,4 +1,4 @@
-#region License
+﻿#region License
 /*
 Copyright © 2014-2018 European Support Limited
 
@@ -16,10 +16,9 @@ limitations under the License.
 */
 #endregion
 
-using Amdocs.Ginger.Common;
-using GingerCore;
 using System;
 using System.Xml;
+using Amdocs.Ginger.Common;
 
 namespace Ginger.UserConfig
 {
