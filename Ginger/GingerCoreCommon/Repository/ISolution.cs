@@ -1,4 +1,4 @@
-#region License
+﻿#region License
 /*
 Copyright © 2014-2018 European Support Limited
 
@@ -16,13 +16,22 @@ limitations under the License.
 */
 #endregion
 
+using System.Collections.Generic;
+using GingerCore.Variables;
+
 namespace Amdocs.Ginger.Repository
 {
     public interface ISolution
     {
         string Name { get; set; }
         string Folder { get; set; }
+        IEnumerable<VariableBase> Variables { get; }
+        string MainApplication { get; }
+        object ExecutionLoggerConfigurationSetList { get; }
+        object RecentlyUsedBusinessFlows { get; }
+        string LastBusinessFlowFileName { get; set; }
 
         ISolution LoadSolution(string solutionFile, bool v);
+        void SetReportsConfigurations();
     }
 }

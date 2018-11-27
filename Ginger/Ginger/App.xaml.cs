@@ -708,7 +708,7 @@ namespace Ginger
                         ValueExpression.SolutionFolder = SolutionFolder;
                         BusinessFlow.SolutionVariables = sol.Variables;
 
-                        App.UserProfile.Solution = sol;
+                        App.UserProfile.Solution = (ISolution) sol;
                         App.UserProfile.Solution.SetReportsConfigurations();
                         App.UserProfile.LoadRecentAppAgentMapping();
                         AutoLogProxy.SetAccount(sol.Account);
