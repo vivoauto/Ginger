@@ -150,7 +150,7 @@ namespace amdocs.ginger.GingerCoreNET
         {
             get
             {
-                return General.DefualtUserLocalWorkingFolder;
+                return General.DefaultUserLocalWorkingFolder;
             }
         }
 

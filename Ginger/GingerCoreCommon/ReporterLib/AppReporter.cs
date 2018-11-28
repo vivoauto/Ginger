@@ -24,7 +24,9 @@ namespace Amdocs.Ginger.Common
     public class AppReporter
     {
         public static event ReportEventHandler ReportEvent;
+
         public delegate void ReportEventHandler(AppReportEventArgs reportEventArgs);
+
         public static void OnReportEvent(eAppReportType reportType, string reportMessage, eAppReporterLogLevel reportLogLevel = eAppReporterLogLevel.INFO, Exception reportExceptionToRecord = null, bool logOnlyOnDebugMode = false, eAppReporterMessageType reportMessageType = eAppReporterMessageType.INFO)
         {
             ReportEventHandler handler = ReportEvent;
@@ -48,5 +50,7 @@ namespace Amdocs.Ginger.Common
         {
             OnReportEvent(reportType: eAppReportType.ToUser, reportMessage: message, reportMessageType: reportMessageType);
         }
+
+        public static eAppReporterLoggingLevel CurrentAppLogLevel { get; internal set; }
     }
 }

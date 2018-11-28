@@ -22,6 +22,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using Amdocs.Ginger.Common;
+using Amdocs.Ginger.Common.GeneralLib;
 using Amdocs.Ginger.Repository;
 using Ginger.UserConfig;
 using GingerCoreNET.SolutionRepositoryLib.RepositoryObjectsLib.PlatformsLib;
@@ -363,7 +364,7 @@ namespace Ginger
         public eAppReporterLoggingLevel AppLogLevel
         {
             get { return mAppLogLevel; }
-            set { mAppLogLevel = value; Reporter.CurrentAppLogLevel = mAppLogLevel; OnPropertyChanged(nameof(AppLogLevel)); }
+            set { mAppLogLevel = value; AppReporter.CurrentAppLogLevel = mAppLogLevel; OnPropertyChanged(nameof(AppLogLevel)); }
         }
 
         eUserType mUserType;
@@ -458,10 +459,10 @@ namespace Ginger
                         {
                             if (mappingDic.Keys.Contains(ap.AppName))
                             {
-                                if (ap != null && WorkSpace.Instance.SolutionRepository.GetAllRepositoryItems<Agent>().Count > 0)
+                                if (ap != null && WorkSpace.Instance.SolutionRepository.GetAllRepositoryItems<IAgent>().Count > 0)
                                 {
-                                    List<Agent> platformAgents = (from p in WorkSpace.Instance.SolutionRepository.GetAllRepositoryItems<Agent>() where p.Platform == ap.Platform select p).ToList();
-                                    Agent matchingAgent = platformAgents.Where(x => x.Name == mappingDic[ap.AppName]).FirstOrDefault();
+                                    List<IAgent> platformAgents = (from p in WorkSpace.Instance.SolutionRepository.GetAllRepositoryItems<IAgent>() where p.Platform == ap.Platform select p).ToList();
+                                    IAgent matchingAgent = platformAgents.Where(x => x.Name == mappingDic[ap.AppName]).FirstOrDefault();
                                     if (matchingAgent != null)
                                         ap.LastMappedAgentName = matchingAgent.Name;
                                 }
@@ -562,7 +563,7 @@ namespace Ginger
         public void LoadDefaults()
         {
             AutoLoadLastSolution = true; //#Task 160            
-            string defualtFolder= WorkSpace.Instance.DefualtUserLocalWorkingFolder;//calling it so it will be created
+            string defaultFolder = WorkSpace.Instance.DefualtUserLocalWorkingFolder;//calling it so it will be created
         }
                
         internal string GetDefaultReport()

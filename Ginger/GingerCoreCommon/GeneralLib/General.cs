@@ -24,7 +24,7 @@ namespace Amdocs.Ginger.Common.GeneralLib
             }
         }
 
-        public static string DefualtUserLocalWorkingFolder
+        public static string DefaultUserLocalWorkingFolder
         {
             get
             {

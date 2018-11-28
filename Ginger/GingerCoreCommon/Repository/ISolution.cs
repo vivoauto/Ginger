@@ -18,6 +18,7 @@ limitations under the License.
 
 using System.Collections.Generic;
 using GingerCore.Variables;
+using GingerCoreNET.SolutionRepositoryLib.RepositoryObjectsLib.PlatformsLib;
 
 namespace Amdocs.Ginger.Repository
 {
@@ -30,6 +31,7 @@ namespace Amdocs.Ginger.Repository
         object ExecutionLoggerConfigurationSetList { get; }
         object RecentlyUsedBusinessFlows { get; }
         string LastBusinessFlowFileName { get; set; }
+        IEnumerable<ApplicationPlatform> ApplicationPlatforms { get; }
 
         ISolution LoadSolution(string solutionFile, bool v);
         void SetReportsConfigurations();
