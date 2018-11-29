@@ -212,7 +212,7 @@ namespace Ginger.Run
                                     if (copiedVar.Formula != originalFormula || copiedVar.Value != originalValue) //variable was changed
                                     {
                                         copiedVar.VarValChanged = true;
-                                        copiedVar.DiffrentFromOrigin = true;
+                                        copiedVar.DifferentFromOrigin = true;
                                     }
                                 }
                             }
@@ -285,7 +285,7 @@ namespace Ginger.Run
             if (varToEdit.Formula != originalFormula || varToEdit.Value != originalValue)//variable was changed
             {
                 varToEdit.VarValChanged = true;
-                varToEdit.DiffrentFromOrigin = true;
+                varToEdit.DifferentFromOrigin = true;
             }
             UpdateEditVariablesTabVisual();
         }
@@ -349,7 +349,7 @@ namespace Ginger.Run
         private void SetAutoDescription()
         {
             string autoDesc = string.Empty;
-            List<VariableBase> bfVariables = (mBusinessFlow.GetBFandActivitiesVariabeles(true)).Where(var => var.GetType() == typeof(VariableSelectionList) || var.DiffrentFromOrigin == true || string.IsNullOrEmpty(var.MappedOutputVariable)==false || string.IsNullOrEmpty(var.MappedOutputValue) == false).ToList(); ;
+            List<VariableBase> bfVariables = (mBusinessFlow.GetBFandActivitiesVariabeles(true)).Where(var => var.GetType() == typeof(VariableSelectionList) || var.DifferentFromOrigin == true || string.IsNullOrEmpty(var.MappedOutputVariable)==false || string.IsNullOrEmpty(var.MappedOutputValue) == false).ToList(); ;
             if (bfVariables != null && bfVariables.Count > 0)
             {
                 autoDesc = "Running Configurations: ";
@@ -433,7 +433,7 @@ namespace Ginger.Run
         {
             int count = 0;
             foreach (VariableBase var in mBusinessFlow.GetBFandActivitiesVariabeles(true,true))
-                if (var.DiffrentFromOrigin == true)
+                if (var.DifferentFromOrigin == true)
                     count++;
 
             if (count > 0)

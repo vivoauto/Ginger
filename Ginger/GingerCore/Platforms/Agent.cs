@@ -53,7 +53,7 @@ namespace GingerCore
     //
     //   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-    public class Agent : RepositoryItemBase
+    public class Agent : RepositoryItemBase, IAgent
     {
         
 
@@ -142,28 +142,14 @@ namespace GingerCore
             FailedToStart
         }
 
-        public static class Fields
-        {
-            public static string Guid = "Guid";
-            public static string Active = "Active";
-            public static string Name = "Name";
-            public static string Host = "Host";
-            public static string Port = "Port";
-            public static string Status = "Status";
-            public static string DriverType = "DriverType";
-            public static string Remote = "Remote";
-            public static string Notes = "Notes";
-            public static string Platform = "Platform";
-            public static string IsWindowExplorerSupportReady = "IsWindowExplorerSupportReady";
-        }
-
         public bool IsWindowExplorerSupportReady
         {
             get
             {
-                if (Driver != null) return  Driver.IsWindowExplorerSupportReady();
-
-                else return false;
+                if (Driver != null)
+                    return  Driver.IsWindowExplorerSupportReady();
+                else
+                    return false;
             }
         }
 
@@ -171,9 +157,10 @@ namespace GingerCore
         {
             get
             {
-                if (Driver != null) return Driver.IsShowWindowExplorerOnStart();
-
-                else return false;
+                if (Driver != null)
+                    return Driver.IsShowWindowExplorerOnStart();
+                else
+                    return false;
             }
         }
         
@@ -195,7 +182,7 @@ namespace GingerCore
                 if (mName != value)
                 {
                     mName = value;
-                    OnPropertyChanged(Fields.Name);
+                    OnPropertyChanged(nameof(Name));
                 }
             }
         }
@@ -302,14 +289,14 @@ namespace GingerCore
             }
         }
 
-        private Task MSTATask = null;  // For STA Driver we keep the STA task 
-        private CancellationTokenSource CTS = null;
+        private Task MSTATask;  // For STA Driver we keep the STA task 
+        private CancellationTokenSource CTS;
         BackgroundWorker CancelTask;
 
         public void StartDriver()
         {
             mIsStarting = true;
-            OnPropertyChanged(Fields.Status);
+            OnPropertyChanged(nameof(Status));
             try
             {
                 try
@@ -449,9 +436,9 @@ namespace GingerCore
                 Thread.Sleep(500);
                 mIsStarting = false;
                 Driver.IsDriverRunning = true;
-                OnPropertyChanged(Fields.Status);
+                OnPropertyChanged(nameof(Status));
                 Driver.driverMessageEventHandler += driverMessageEventHandler;
-                OnPropertyChanged(Fields.IsWindowExplorerSupportReady);
+                OnPropertyChanged(nameof(IsWindowExplorerSupportReady));
             }
         }
 
@@ -460,7 +447,7 @@ namespace GingerCore
         {
             if (e.DriverMessageType == DriverBase.eDriverMessageType.DriverStatusChanged)
             {
-                OnPropertyChanged(Fields.Status);
+                OnPropertyChanged(nameof(Status));
             }
         }
 
@@ -689,8 +676,8 @@ namespace GingerCore
             }
             finally
             {
-                OnPropertyChanged(Fields.Status);
-                OnPropertyChanged(Fields.IsWindowExplorerSupportReady);
+                OnPropertyChanged(nameof(Status));
+                OnPropertyChanged(nameof(IsWindowExplorerSupportReady));
             }
         }
 
