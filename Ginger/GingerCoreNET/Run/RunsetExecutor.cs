@@ -1,50 +1,21 @@
-#region License
-/*
-Copyright © 2014-2018 European Support Limited
-
-Licensed under the Apache License, Version 2.0 (the "License")
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at 
-
-http://www.apache.org/licenses/LICENSE-2.0 
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS, 
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
-See the License for the specific language governing permissions and 
-limitations under the License. 
-*/
-#endregion
-
+﻿using amdocs.ginger.GingerCoreNET;
 using Amdocs.Ginger.Common;
+using Amdocs.Ginger.Common.InterfacesLib;
+using Amdocs.Ginger.CoreNET.Run.RunsetActions;
+using Amdocs.Ginger.CoreNET.Run.RunSetActions;
+using GingerCoreNET.ReporterLib;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using GingerCore;
-using GingerCore.Environments;
-using GingerCore.Platforms;
-using Ginger.Reports;
-using GingerCore.Actions.PlugIns;
-using GingerCore.Variables;
-using Ginger.Repository;
-using Ginger.Run.RunSetActions;
-using System.ComponentModel;
-using System.Reflection;
-using GingerCore.SourceControl;
-using Ginger.AnalyzerLib;
-using GingerCoreNET.SourceControl;
-using amdocs.ginger.GingerCoreNET;
-using Amdocs.Ginger;
-using Amdocs.Ginger.Repository;
-using GingerCore.DataSource;
-using Amdocs.Ginger.Common.InterfacesLib;
 
-namespace Ginger.Run
+namespace Amdocs.Ginger.CoreNET.Run
 {
-    public class RunsetExecutor : INotifyPropertyChanged, IRunsetExecutor
+    public class RunsetExecutor : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
         public void OnPropertyChanged(string name)
@@ -82,8 +53,8 @@ namespace Ginger.Run
             }
         }
 
-        
-        public ObservableList<GingerRunner> Runners
+
+        public ObservableList<IGingerRunner> Runners
         {
             get
             {
@@ -91,8 +62,8 @@ namespace Ginger.Run
             }
         }
 
-        private ProjEnvironment mRunsetExecutionEnvironment = null;
-        public ProjEnvironment RunsetExecutionEnvironment
+        private IProjEnvironment mRunsetExecutionEnvironment = null;
+        public IProjEnvironment RunsetExecutionEnvironment
         {
             get
             {
@@ -109,7 +80,7 @@ namespace Ginger.Run
 
         public void ConfigureAllRunnersForExecution()
         {
-            foreach (GingerRunner runner in Runners)
+            foreach (IGingerRunner runner in Runners)
                 ConfigureRunnerForExecution(runner);
         }
 
@@ -119,22 +90,22 @@ namespace Ginger.Run
             set { mDefectSuggestionsList = value; }
         }
 
-        public void ConfigureRunnerForExecution(GingerRunner runner)
+        public void ConfigureRunnerForExecution(IGingerRunner runner)
         {
-            runner.SetExecutionEnvironment(RunsetExecutionEnvironment, WorkSpace.Instance.SolutionRepository.GetAllRepositoryItems<ProjEnvironment>());
-            
-            runner.CurrentSolution = App.UserProfile.Solution;
+            runner.SetExecutionEnvironment(RunsetExecutionEnvironment, WorkSpace.Instance.SolutionRepository.GetAllRepositoryItems<IProjEnvironment>());
+
+            runner.CurrentSolution = WorkSpace.Solution;
             runner.SolutionAgents = WorkSpace.Instance.SolutionRepository.GetAllRepositoryItems<Agent>();
             // runner.PlugInsList = App.LocalRepository.GetSolutionPlugIns();
-            runner.DSList = WorkSpace.Instance.SolutionRepository.GetAllRepositoryItems<DataSourceBase>();
+            runner.DSList = WorkSpace.Instance.SolutionRepository.GetAllRepositoryItems<IDataSourceBase>();
             runner.SolutionApplications = App.UserProfile.Solution.ApplicationPlatforms;
             runner.SolutionFolder = App.UserProfile.Solution.Folder;
         }
 
-        public void InitRunner(GingerRunner runner)
+        public void InitRunner(IGingerRunner runner)
         {
             //Configure Runner for execution
-            runner.Status = Amdocs.Ginger.CoreNET.Execution.eRunStatus.Pending;
+            runner.Status = Execution.eRunStatus.Pending;
             ConfigureRunnerForExecution(runner);
 
             //Set the Apps agents
@@ -148,8 +119,8 @@ namespace Ginger.Run
             runner.BusinessFlows.Clear();
             foreach (BusinessFlowRun bf in runner.BusinessFlowsRunList)
             {
-                ObservableList<BusinessFlow> businessFlows = WorkSpace.Instance.SolutionRepository.GetAllRepositoryItems<BusinessFlow>();
-                BusinessFlow BF1 = (from bfr in businessFlows where bfr.Guid == bf.BusinessFlowGuid select bfr).FirstOrDefault();
+                ObservableList<IBusinessFlow> businessFlows = WorkSpace.Instance.SolutionRepository.GetAllRepositoryItems<IBusinessFlow>();
+                IBusinessFlow BF1 = (from bfr in businessFlows where bfr.Guid == bf.BusinessFlowGuid select bfr).FirstOrDefault();
                 if (BF1 == null)
                     BF1 = (from bfr in businessFlows where bfr.Name == bf.BusinessFlowName select bfr).FirstOrDefault();
                 if (BF1 == null)
@@ -161,15 +132,17 @@ namespace Ginger.Run
                 else
                 {
                     // Very slow
-                    BusinessFlow BFCopy = (BusinessFlow)BF1.CreateCopy(false);
+                    IBusinessFlow BFCopy = (IBusinessFlow)BF1.CreateCopy(false);
                     BFCopy.Reset();
                     BFCopy.Active = bf.BusinessFlowIsActive;
                     BFCopy.Mandatory = bf.BusinessFlowIsMandatory;
                     BFCopy.AttachActivitiesGroupsAndActivities();
-                    if (bf.BusinessFlowInstanceGuid == Guid.Empty) {
+                    if (bf.BusinessFlowInstanceGuid == Guid.Empty)
+                    {
                         BFCopy.InstanceGuid = Guid.NewGuid();
                     }
-                    else {
+                    else
+                    {
                         BFCopy.InstanceGuid = bf.BusinessFlowInstanceGuid;
                     }
                     if (bf.BusinessFlowCustomizedRunVariables != null && bf.BusinessFlowCustomizedRunVariables.Count > 0)
@@ -195,12 +168,12 @@ namespace Ginger.Run
                     runner.BusinessFlows.Add(BFCopy);
                 }
             }
-        }     
+        }
 
         public ObservableList<BusinessFlowExecutionSummary> GetAllBusinessFlowsExecutionSummary(bool GetSummaryOnlyForExecutedFlow = false)
         {
             ObservableList<BusinessFlowExecutionSummary> BFESs = new ObservableList<BusinessFlowExecutionSummary>();
-            foreach (GingerRunner ARC in Runners)
+            foreach (IGingerRunner ARC in Runners)
             {
                 BFESs.Append(ARC.GetAllBusinessFlowsExecutionSummary(GetSummaryOnlyForExecutedFlow, ARC.Name));
             }
@@ -209,7 +182,7 @@ namespace Ginger.Run
 
         internal void CloseAllEnvironments()
         {
-            foreach (GingerRunner gr in Runners)
+            foreach (IGingerRunner gr in Runners)
             {
                 if (gr.UseSpecificEnvironment)
                 {
@@ -222,15 +195,15 @@ namespace Ginger.Run
         }
 
 
-        public void SetRunnersEnv(ProjEnvironment defualtEnv, ObservableList<ProjEnvironment> allEnvs)
+        public void SetRunnersEnv(IProjEnvironment defualtEnv, ObservableList<IProjEnvironment> allEnvs)
         {
-            foreach (GingerRunner GR in Runners)
+            foreach (IGingerRunner GR in Runners)
             {
                 GR.SetExecutionEnvironment(defualtEnv, allEnvs);
             }
         }
 
-        
+
         public void SetRunnersExecutionLoggerConfigs()
         {
             _selectedExecutionLoggerConfiguration = App.UserProfile.Solution.ExecutionLoggerConfigurationSetList.Where(x => (x.IsSelected == true)).FirstOrDefault();
@@ -265,16 +238,16 @@ namespace Ginger.Run
             });
             return result;
         }
-        
-        public void RunRunset(bool doContinueRun=false)
+
+        public void RunRunset(bool doContinueRun = false)
         {
             List<Task> runnersTasks = new List<Task>();
-            
+
             //reset run       
             if (doContinueRun == false)
             {
                 RunSetConfig.LastRunsetLoggerFolder = "-1";
-                Reporter.ToLog(eAppReporterLogLevel.INFO, string.Format("Reseting {0} elements", GingerDicser.GetTermResValue(eTermResKey.RunSet)));                
+                Reporter.ToLog(eAppReporterLogLevel.INFO, string.Format("Reseting {0} elements", GingerDicser.GetTermResValue(eTermResKey.RunSet)));
                 mStopwatch.Reset();
                 ResetRunnersExecutionDetails();
             }
@@ -287,14 +260,14 @@ namespace Ginger.Run
             //configure Runners for run
             Reporter.ToLog(eAppReporterLogLevel.INFO, string.Format("Configurating {0} elements for execution", GingerDicser.GetTermResValue(eTermResKey.RunSet)));
             ConfigureAllRunnersForExecution();
-           
+
             //Process all pre execution Run Set Operations
             if (doContinueRun == false)
             {
                 Reporter.ToLog(eAppReporterLogLevel.INFO, string.Format("Running Pre-Execution {0} Operations", GingerDicser.GetTermResValue(eTermResKey.RunSet)));
                 App.MainWindow.Dispatcher.Invoke(() => //ToDO: Remove dependency on UI thread- it should run in backend
                 {
-                    App.RunsetExecutor.ProcessRunSetActions(new List<RunSetActionBase.eRunAt> { RunSetActionBase.eRunAt.ExecutionStart, RunSetActionBase.eRunAt.DuringExecution});
+                    App.RunsetExecutor.ProcessRunSetActions(new List<RunSetActionBase.eRunAt> { RunSetActionBase.eRunAt.ExecutionStart, RunSetActionBase.eRunAt.DuringExecution });
                 });
             }
 
@@ -310,20 +283,20 @@ namespace Ginger.Run
             if (RunSetConfig.RunModeParallel)
             {
                 //running parallel 
-                foreach (GingerRunner GR in Runners)
+                foreach (IGingerRunner GR in Runners)
                 {
                     if (mStopRun) return;
 
-                    Task t = new Task(() => 
+                    Task t = new Task(() =>
                     {
                         if (doContinueRun == false)
                             GR.RunRunner();
                         else
                             if (GR.Status == Amdocs.Ginger.CoreNET.Execution.eRunStatus.Stopped)//we continue only Stopped Runners
-                            {
-                                GR.ResetRunnerExecutionDetails(doNotResetBusFlows: true);//reset stopped runners only and not their BF's
-                                GR.ContinueRun(GingerRunner.eContinueLevel.Runner, GingerRunner.eContinueFrom.LastStoppedAction);
-                            }
+                        {
+                            GR.ResetRunnerExecutionDetails(doNotResetBusFlows: true);//reset stopped runners only and not their BF's
+                            GR.ContinueRun(GingerRunner.eContinueLevel.Runner, GingerRunner.eContinueFrom.LastStoppedAction);
+                        }
                     }, TaskCreationOptions.LongRunning);
                     runnersTasks.Add(t);
                     t.Start();
@@ -337,7 +310,7 @@ namespace Ginger.Run
                 //running sequentially 
                 Task t = new Task(() =>
                 {
-                    foreach (GingerRunner GR in Runners)
+                    foreach (IGingerRunner GR in Runners)
                     {
                         if (mStopRun) return;
 
@@ -345,14 +318,14 @@ namespace Ginger.Run
                             GR.RunRunner();
                         else
                             if (GR.Status == Amdocs.Ginger.CoreNET.Execution.eRunStatus.Stopped)//we continue only Stopped Runners
-                            {
-                                GR.ResetRunnerExecutionDetails(doNotResetBusFlows: true);//reset stopped runners only and not their BF's
-                                GR.ContinueRun(GingerRunner.eContinueLevel.Runner, GingerRunner.eContinueFrom.LastStoppedAction);
-                            }
-                            else if(GR.Status == Amdocs.Ginger.CoreNET.Execution.eRunStatus.Pending)//continue the runners flow
-                            {
-                                GR.RunRunner();
-                            }
+                        {
+                            GR.ResetRunnerExecutionDetails(doNotResetBusFlows: true);//reset stopped runners only and not their BF's
+                            GR.ContinueRun(GingerRunner.eContinueLevel.Runner, GingerRunner.eContinueFrom.LastStoppedAction);
+                        }
+                        else if (GR.Status == Amdocs.Ginger.CoreNET.Execution.eRunStatus.Pending)//continue the runners flow
+                        {
+                            GR.RunRunner();
+                        }
                         // Wait one second before starting another runner
                         Thread.Sleep(1000);
                     }
@@ -406,16 +379,16 @@ namespace Ginger.Run
                         runSetReportName = ExecutionLogger.defaultRunTabLogName;
                     }
                     string exec_folder = ExecutionLogger.GetLoggerDirectory(_selectedExecutionLoggerConfiguration.ExecutionLoggerConfigurationExecResultsFolder + "\\" + runSetReportName + "_" + Runners[0].ExecutionLogger.CurrentExecutionDateTime.ToString("MMddyyyy_HHmmss"));
-                    string reportsResultFolder = Ginger.Reports.GingerExecutionReport.ExtensionMethods.CreateGingerExecutionReport(new ReportInfo(exec_folder), false,null, null, false,currentConf.HTMLReportConfigurationMaximalFolderSize);
+                    string reportsResultFolder = Ginger.Reports.GingerExecutionReport.ExtensionMethods.CreateGingerExecutionReport(new ReportInfo(exec_folder), false, null, null, false, currentConf.HTMLReportConfigurationMaximalFolderSize);
                 }
             }
         }
 
         public void ResetRunnersExecutionDetails()
         {
-            foreach (GingerRunner runner in Runners)
+            foreach (IGingerRunner runner in Runners)
             {
-                runner.ResetRunnerExecutionDetails();                
+                runner.ResetRunnerExecutionDetails();
                 runner.CloseAgents();
             }
         }
@@ -423,13 +396,13 @@ namespace Ginger.Run
         internal void StopRun()
         {
             mStopRun = true;
-            foreach (GingerRunner runner in Runners)
+            foreach (IGingerRunner runner in Runners)
             {
                 if (runner.IsRunning)
                     runner.StopRun();
             }
         }
-        
+
 
         internal void ProcessRunSetActions(List<RunSetActionBase.eRunAt> runAtList)
         {
@@ -443,7 +416,7 @@ namespace Ginger.Run
                     switch (RSA.RunAt)
                     {
                         case RunSetActionBase.eRunAt.DuringExecution:
-                            if(RSA is RunSetActions.RunSetActionPublishToQC)
+                            if (RSA is RunSetActions.RunSetActionPublishToQC)
                                 RSA.PrepareDuringExecAction(Runners);
                             break;
 
@@ -464,7 +437,7 @@ namespace Ginger.Run
         {
             //TODO: write UT to validate this function
 
-            RSA.SolutionFolder = App.UserProfile.Solution.Folder;
+            RSA.SolutionFolder = WorkSpace.Solution.Folder;
             switch (RSA.Condition)
             {
                 case RunSetActionBase.eRunSetActionCondition.AlwaysRun:
@@ -568,7 +541,7 @@ namespace Ginger.Run
                 AutoLogProxy.UserOperationEnd();
             }
         }
-      
+
         private bool ProcessCommandLineArgs()
         {
             // New option with one arg to config file
@@ -591,7 +564,7 @@ namespace Ginger.Run
 
                 Reporter.ToLog(eAppReporterLogLevel.INFO, "Reading all arguments from the Config file placed at: '" + AutoRunFileName + "'");
                 string[] lines = System.IO.File.ReadAllLines(AutoRunFileName);
-                
+
                 string scURL = null;
                 string scUser = null;
                 string scPswd = null;
@@ -699,7 +672,7 @@ namespace Ginger.Run
 
                         case "Env":
                             Reporter.ToLog(eAppReporterLogLevel.INFO, "Selected Environment: '" + value + "'");
-                            ProjEnvironment env = WorkSpace.Instance.SolutionRepository.GetAllRepositoryItems<ProjEnvironment>().Where(x => x.Name.ToLower().Trim() == value.ToLower().Trim()).FirstOrDefault();
+                            IProjEnvironment env = WorkSpace.Instance.SolutionRepository.GetAllRepositoryItems<IProjEnvironment>().Where(x => x.Name.ToLower().Trim() == value.ToLower().Trim()).FirstOrDefault();
                             if (env != null)
                             {
                                 RunsetExecutionEnvironment = env;
@@ -749,7 +722,7 @@ namespace Ginger.Run
             }
         }
 
-        public async Task<int> RunRunsetAnalyzerBeforeRun(bool runInSilentMode=false)
+        public async Task<int> RunRunsetAnalyzerBeforeRun(bool runInSilentMode = false)
         {
             if (mRunSetConfig.RunWithAnalyzer)
             {
@@ -759,7 +732,7 @@ namespace Ginger.Run
                 {
                     AnalyzerPage analyzerPage = new AnalyzerPage();
 
-                    analyzerPage.Init(App.UserProfile.Solution, mRunSetConfig);
+                    analyzerPage.Init(WorkSpace.Solution, mRunSetConfig);
                     await analyzerPage.AnalyzeWithoutUI();
 
 
@@ -783,4 +756,3 @@ namespace Ginger.Run
         }
     }
 }
-

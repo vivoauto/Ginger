@@ -38,6 +38,7 @@ using amdocs.ginger.GingerCoreNET;
 using Amdocs.Ginger.CoreNET.Run.RunsetActions;
 using Amdocs.Ginger.Common.GeneralLib;
 using Amdocs.Ginger.Common.InterfacesLib;
+using GingerCoreNET.ReporterLib;
 
 namespace Ginger.Run.RunSetActions
 {
@@ -84,7 +85,8 @@ namespace Ginger.Run.RunSetActions
             {
                 if (mValueExpression == null)
                 {
-                    mValueExpression = new IValueExpression(App.RunsetExecutor.RunsetExecutionEnvironment, null, WorkSpace.Instance.SolutionRepository.GetAllRepositoryItems<DataSourceBase>(), false, "", false, App.UserProfile.Solution.Variables);
+                    
+                       mValueExpression = RepositoryItemHelper.RepositoryItemFactory.CreateValueExpression(WorkSpace.ProjEnvironment , null, WorkSpace.Instance.SolutionRepository.GetAllRepositoryItems<IDataSourceBase>());
                 }
                 return mValueExpression;
             }
@@ -1181,10 +1183,6 @@ namespace Ginger.Run.RunSetActions
             return text;
         }
 
-        public override void PrepareDuringExecAction(ObservableList<GingerRunner> Gingers)
-        {
-            throw new NotImplementedException();
-        }
 
         public override void PrepareDuringExecAction(ObservableList<IGingerRunner> Gingers)
         {

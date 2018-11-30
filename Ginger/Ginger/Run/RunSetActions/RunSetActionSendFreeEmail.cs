@@ -31,6 +31,7 @@ using Ginger.Reports.HTMLReports;
 using System.Collections.Generic;
 using amdocs.ginger.GingerCoreNET;
 using GingerCore.DataSource;
+using Amdocs.Ginger.Common.InterfacesLib;
 
 namespace Ginger.Run.RunSetActions
 {
@@ -69,7 +70,7 @@ namespace Ginger.Run.RunSetActions
             {
                 if (mValueExpression == null)
                 {
-                    mValueExpression = new ValueExpression(App.RunsetExecutor.RunsetExecutionEnvironment, null, WorkSpace.Instance.SolutionRepository.GetAllRepositoryItems<DataSourceBase>(), false, "", false, App.UserProfile.Solution.Variables);
+                    mValueExpression = new ValueExpression(App.RunsetExecutor.RunsetExecutionEnvironment, null, WorkSpace.Instance.SolutionRepository.GetAllRepositoryItems<IDataSourceBase>(), false, "", false, App.UserProfile.Solution.Variables);
                 }
                 return mValueExpression;
             }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using amdocs.ginger.GingerCoreNET;
 using Amdocs.Ginger.Common;
 using Amdocs.Ginger.Common.GeneralLib;
 using Amdocs.Ginger.Common.InterfacesLib;
@@ -11,6 +12,8 @@ namespace Amdocs.Ginger.CoreNET.Run.RunsetActions
 {
     public class RunSetActionSendFreeEmail : RunSetActionBase
     {
+        IProjEnvironment mProjEnvironment;
+        IBusinessFlow mBusinessFlow;
         public new static class Fields
         {
             public static string HTMLReportTemplate = "HTMLReportTemplate";
@@ -40,14 +43,15 @@ namespace Amdocs.Ginger.CoreNET.Run.RunsetActions
         IValueExpression mValueExpression = null;
         IValueExpression mVE
         {
-            //get
-            //{
-            //    if (mValueExpression == null)
-            //    {
-            //        mValueExpression = new ValueExpression(App.RunsetExecutor.RunsetExecutionEnvironment, null, WorkSpace.Instance.SolutionRepository.GetAllRepositoryItems<DataSourceBase>(), false, "", false, App.UserProfile.Solution.Variables);
-            //    }
-            //    return mValueExpression;
-            //}
+            get
+            {
+                if (mValueExpression == null)
+                {
+                   // mValueExpression = new ValueExpression(App.RunsetExecutor.RunsetExecutionEnvironment, null, WorkSpace.Instance.SolutionRepository.GetAllRepositoryItems<DataSourceBase>(), false, "", false, App.UserProfile.Solution.Variables);
+                    mValueExpression = RepositoryItemHelper.RepositoryItemFactory.CreateValueExpression(WorkSpace.ProjEnvironment, null, WorkSpace.Instance.SolutionRepository.GetAllRepositoryItems<IDataSourceBase>(), false);
+                }
+                return mValueExpression;
+            }
         }
 
         private string mBodytext;

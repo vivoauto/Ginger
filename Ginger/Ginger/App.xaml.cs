@@ -181,9 +181,21 @@ namespace Ginger
         public static Amdocs.Ginger.CoreNET.Execution.eRunStatus RunSetExecutionStatus = Amdocs.Ginger.CoreNET.Execution.eRunStatus.Failed;
         /// <summary>
         /// Hold all Run Set execution data + execution methods
-        /// </summary>        
-        public static RunsetExecutor RunsetExecutor = new RunsetExecutor();
-
+        /// </summary> 
+        public static RunsetExecutor mRunsetExecutor;
+        //public static RunsetExecutor RunsetExecutor = new RunsetExecutor();
+        public static RunsetExecutor RunsetExecutor
+        {
+            get
+            {
+                return mRunsetExecutor;
+            }
+            set
+            {
+               // mRunsetExecutor = value;
+            }
+            
+        }
         //TODO: whenever changed check if isDirty - and ask the user if to save
         public static RepositoryItemBase CurrentRepositoryItem { get; set; }
 

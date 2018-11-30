@@ -18,6 +18,8 @@ limitations under the License.
 
 using Amdocs.Ginger.Common;
 using Amdocs.Ginger.Common.GeneralLib;
+using Amdocs.Ginger.Common.InterfacesLib;
+using Amdocs.Ginger.CoreNET;
 using Amdocs.Ginger.Repository;
 using GingerCoreNET.RunLib;
 using GingerCoreNET.SourceControl;
@@ -25,13 +27,14 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
+using Amdocs.Ginger.Repository;
 
 namespace amdocs.ginger.GingerCoreNET
 {
     // WorkSpace is one object per user accessible from anywhere and hold the current status of the user selection
     // For GingerWPF it is one per running app
     // For Web it can be one per user connected
-    public class WorkSpace
+    public class WorkSpace : RepositoryItemBase
     {
         private static WorkSpace mWorkSpace;
 
@@ -192,6 +195,23 @@ namespace amdocs.ginger.GingerCoreNET
         //    string filename = UserProfile.CreateUserProfileFileName();
         //    UserProfile.Save(filename);
         //}
+        public static IProjEnvironment ProjEnvironment;
+        public static IRunsetExecutor RunsetExecutor;
+        public static Solution mSolution { get; set; }
+        public static Solution Solution
+        {
+            get { return mSolution; }
+            set
+            {
+                mSolution = value;
+                OnPropertyChanged(nameof(Solution));
+            }
+        }
+        public static ObservableList<IGingerRunner> Runners
+        {
+            get;set;
+        }
+        public override string ItemName { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
         private void ApplicationAgents_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {

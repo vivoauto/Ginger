@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using amdocs.ginger.GingerCoreNET;
 
 namespace Amdocs.Ginger.CoreNET.Run.RunSetActions
 {
@@ -86,7 +87,7 @@ namespace Amdocs.Ginger.CoreNET.Run.RunSetActions
                     {
                         ObservableList<IBusinessFlow> BFs = new ObservableList<IBusinessFlow>();
 
-                        foreach (GingerRunner GR in App.RunsetExecutor.Runners)
+                        foreach (IGingerRunner GR in WorkSpace.Runners)
                         {
                             foreach (IBusinessFlow bf in GR.BusinessFlows)
                             {
@@ -94,10 +95,10 @@ namespace Amdocs.Ginger.CoreNET.Run.RunSetActions
                                 {
                                     if (bf.RunStatus == nameof(Execution.eRunStatus.Passed) || bf.RunStatus == nameof(Execution.eRunStatus.Failed) || bf.RunStatus == nameof(Execution.eRunStatus.Stopped))
                                     {
-                                        ReportInfo BFRI = new ReportInfo(App.AutomateTabGingerRunner.ProjEnvironment, bf);
-
+                                        //ReportInfo BFRI = new ReportInfo(App.AutomateTabGingerRunner.ProjEnvironment, bf);
+                                        IReportInfo BFRI = null;
                                         string TempRepFileName = ReportTemplate.GenerateReport(TemplateName, BFRI);
-                                        String RepFileName = DateTime.Now.ToString("dMMMyyyy_HHmmss_fff") + "_" + App.RunsetExecutor.RunSetConfig.Name + "_" + GR.Name + "_" + bf.Name + "_" + App.RunsetExecutor.RunsetExecutionEnvironment.Name;
+                                        String RepFileName = DateTime.Now.ToString("dMMMyyyy_HHmmss_fff") + "_" + App.RunsetExecutor.RunSetConfig.Name + "_" + GR.Name + "_" + bf.Name + "_" + WorkSpace.ProjEnvironment;
 
                                         while (RepFileName.Length > 250)
                                         {

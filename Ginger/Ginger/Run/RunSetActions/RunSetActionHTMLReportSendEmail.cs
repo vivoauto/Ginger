@@ -39,6 +39,7 @@ using System.Security.Principal;
 using Amdocs.Ginger;
 using amdocs.ginger.GingerCoreNET;
 using GingerCore.DataSource;
+using Amdocs.Ginger.Common.InterfacesLib;
 
 namespace Ginger.Run.RunSetActions
 {
@@ -78,13 +79,13 @@ namespace Ginger.Run.RunSetActions
         [IsSerializedForLocalRepository]
         public Email Email = new Email();
 
-        ValueExpression mValueExpression = null;
-        ValueExpression mVE
+        IValueExpression mValueExpression = null;
+        IValueExpression mVE
         {
             get {
                 if (mValueExpression == null)
                 {
-                    mValueExpression = new ValueExpression(App.RunsetExecutor.RunsetExecutionEnvironment, null, WorkSpace.Instance.SolutionRepository.GetAllRepositoryItems<DataSourceBase>(), false, "", false, App.UserProfile.Solution.Variables);
+                    mValueExpression = RepositoryItemHelper.RepositoryItemFactory.CreateValueExpression(WorkSpace.ProjEnvironment, null, WorkSpace.Instance.SolutionRepository.GetAllRepositoryItems<IDataSourceBase>(), false);
                 }
                 return mValueExpression;
             }
