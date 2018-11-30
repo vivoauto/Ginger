@@ -8,7 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Amdocs.Ginger.CoreNET.Run
+namespace Ginger.Run
 {
     public class RunSetConfig : RepositoryItemBase
     {

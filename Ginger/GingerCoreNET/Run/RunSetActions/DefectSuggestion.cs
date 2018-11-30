@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Text;
 
-namespace Amdocs.Ginger.CoreNET.Run.RunSetActions
+namespace Ginger.Run.RunSetActions
 {
     public class DefectSuggestion
     {

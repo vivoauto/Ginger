@@ -1,6 +1,8 @@
 ﻿using amdocs.ginger.GingerCoreNET;
 using Amdocs.Ginger.Common;
+using Amdocs.Ginger.CoreNET.Reports;
 using Amdocs.Ginger.Repository;
+using GingerCore;
 using GingerCore.Variables;
 using GingerCoreNET.ALMLib;
 using GingerCoreNET.GeneralLib;
@@ -15,7 +17,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Amdocs.Ginger.CoreNET
+namespace Ginger.SolutionGeneral
 {
     public class Solution : RepositoryItemBase
     {

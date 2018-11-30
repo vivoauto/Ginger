@@ -7,7 +7,7 @@ using GingerCoreNET.ReporterLib;
 using System.Diagnostics;
 using Amdocs.Ginger.Common.InterfacesLib;
 
-namespace Amdocs.Ginger.CoreNET.Run.RunsetActions
+namespace Ginger.Run.RunsetActions
 {
     public abstract class RunSetActionBase : RepositoryItemBase
     {

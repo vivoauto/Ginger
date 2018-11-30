@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace Amdocs.Ginger.CoreNET.Run.RunsetActions
+namespace Ginger.Run.RunsetActions
 {
     public class RunSetActionGenerateTestNGReport : RunSetActionBase
     {

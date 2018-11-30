@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace Amdocs.Ginger.CoreNET.Run.RunSetActions
+namespace Ginger.Run.RunSetActions
 {
     public class RunSetActionSendEmail : RunSetActionBase
     {

@@ -3,7 +3,9 @@ using Amdocs.Ginger.Common;
 using Amdocs.Ginger.Common.InterfacesLib;
 using Amdocs.Ginger.CoreNET.Run.RunsetActions;
 using Amdocs.Ginger.CoreNET.Run.RunSetActions;
+using GingerCore;
 using GingerCoreNET.ReporterLib;
+using GingerCoreNET.SourceControl;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -13,7 +15,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Amdocs.Ginger.CoreNET.Run
+namespace Ginger.Run
 {
     public class RunsetExecutor : INotifyPropertyChanged
     {

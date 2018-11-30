@@ -9,7 +9,7 @@ using System.IO;
 using System.Text;
 using amdocs.ginger.GingerCoreNET;
 
-namespace Amdocs.Ginger.CoreNET.Run.RunSetActions
+namespace Ginger.Run.RunSetActions
 {
     public class RunSetActionSaveResults : RunSetActionBase
     {

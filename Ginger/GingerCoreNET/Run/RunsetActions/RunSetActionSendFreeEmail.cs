@@ -8,7 +8,7 @@ using Amdocs.Ginger.Common.InterfacesLib;
 using Amdocs.Ginger.Repository;
 using GingerCoreNET.ReporterLib;
 
-namespace Amdocs.Ginger.CoreNET.Run.RunsetActions
+namespace Ginger.Run.RunsetActions
 {
     public class RunSetActionSendFreeEmail : RunSetActionBase
     {
