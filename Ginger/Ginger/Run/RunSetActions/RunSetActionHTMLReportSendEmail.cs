@@ -37,7 +37,7 @@ using System.Drawing.Imaging;
 using System.Reflection;
 using System.Security.Principal;
 using Amdocs.Ginger;
-using amdocs.ginger.GingerCoreNET;
+using Amdocs.ginger.GingerCoreNET;
 using GingerCore.DataSource;
 using Amdocs.Ginger.Common.InterfacesLib;
 

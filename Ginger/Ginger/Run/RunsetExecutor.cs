@@ -40,11 +40,11 @@ using amdocs.ginger.GingerCoreNET;
 using Amdocs.Ginger;
 using Amdocs.Ginger.Repository;
 using GingerCore.DataSource;
-using Amdocs.Ginger.Common.InterfacesLib;
+
 
 namespace Ginger.Run
 {
-    public class RunsetExecutor : INotifyPropertyChanged, IRunsetExecutor
+    public class RunsetExecutor : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
         public void OnPropertyChanged(string name)

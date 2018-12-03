@@ -4,13 +4,13 @@ using System.Net.Mail;
 using System.Text;
 using Amdocs.Ginger.Repository;
 
-namespace Amdocs.Ginger.Common.GeneralLib
+namespace GingerCore.GeneralLib
 {
     public class Email : RepositoryItemBase
     {
         //OutLook.MailItem mOutlookMail;
 
-        public new static class Fieldss
+        public new static class Fields
         {
             public static string SMTPMailHost = "SMTPMailHost";
             public static string SMTPPort = "SMTPPort";

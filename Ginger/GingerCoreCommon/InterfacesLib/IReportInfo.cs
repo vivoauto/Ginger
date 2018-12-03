@@ -2,9 +2,10 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Amdocs.Ginger.Common.InterfacesLib
+namespace Amdocs.Ginger.Common
 {
     public interface IReportInfo
     {
+
     }
 }

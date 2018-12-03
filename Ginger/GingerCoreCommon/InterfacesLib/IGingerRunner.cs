@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Amdocs.Ginger.CoreNET.Execution;
 
 namespace Amdocs.Ginger.Common.InterfacesLib
 {
@@ -13,7 +14,8 @@ namespace Amdocs.Ginger.Common.InterfacesLib
         object DSList { get; set; }
         object SolutionApplications { get; set; }
         object SolutionFolder { get; set; }
-        Ginger.CoreNET.Execution.eRunStatus Status { get; set; }
+        
+       
 
         void SetExecutionEnvironment(IProjEnvironment runsetExecutionEnvironment, object p);
     }

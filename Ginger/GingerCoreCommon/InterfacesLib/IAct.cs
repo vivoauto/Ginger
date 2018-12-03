@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Amdocs.Ginger.Common
+namespace Amdocs.Ginger.Common.InterfacesLib
 {
-    public interface IRepositoryItem
+    public interface IAct
     {
-
     }
 }

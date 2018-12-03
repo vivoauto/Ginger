@@ -1,9 +1,13 @@
 ﻿using amdocs.ginger.GingerCoreNET;
 using Amdocs.Ginger.Common;
 using Amdocs.Ginger.Common.InterfacesLib;
+using Amdocs.Ginger.CoreNET.Execution;
 using Amdocs.Ginger.CoreNET.Run.RunsetActions;
 using Amdocs.Ginger.CoreNET.Run.RunSetActions;
+using Amdocs.Ginger.Repository;
+using Ginger.Run.RunSetActions;
 using GingerCore;
+using GingerCore.Variables;
 using GingerCoreNET.ReporterLib;
 using GingerCoreNET.SourceControl;
 using System;
@@ -100,14 +104,14 @@ namespace Ginger.Run
             runner.SolutionAgents = WorkSpace.Instance.SolutionRepository.GetAllRepositoryItems<Agent>();
             // runner.PlugInsList = App.LocalRepository.GetSolutionPlugIns();
             runner.DSList = WorkSpace.Instance.SolutionRepository.GetAllRepositoryItems<IDataSourceBase>();
-            runner.SolutionApplications = App.UserProfile.Solution.ApplicationPlatforms;
-            runner.SolutionFolder = App.UserProfile.Solution.Folder;
+            runner.SolutionApplications = WorkSpace.Solution.ApplicationPlatforms;
+            runner.SolutionFolder = WorkSpace.Solution.Folder;
         }
 
         public void InitRunner(IGingerRunner runner)
         {
             //Configure Runner for execution
-            runner.Status = Execution.eRunStatus.Pending;
+            runner.Status = eRunStatus.Pending;
             ConfigureRunnerForExecution(runner);
 
             //Set the Apps agents

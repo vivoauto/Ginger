@@ -1,7 +1,9 @@
 ﻿using amdocs.ginger.GingerCoreNET;
+using Amdocs.Ginger;
 using Amdocs.Ginger.Common;
 using Amdocs.Ginger.CoreNET.Reports;
 using Amdocs.Ginger.Repository;
+using Ginger.Reports;
 using GingerCore;
 using GingerCore.Variables;
 using GingerCoreNET.ALMLib;

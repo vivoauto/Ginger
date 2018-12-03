@@ -16,6 +16,7 @@ limitations under the License.
 */
 #endregion
 
+using Amdocs.Ginger.Common;
 using GingerCore;
 using System;
 using System.Collections.Generic;
@@ -107,7 +108,8 @@ namespace GingerCoreNET.ReporterLib
         AskIfSureWantToDeLink,AnalyzerFoundIssues,AnalyzerSaveRunSet,
         AskIfSureWantToUndoChange,
         CurrentActionNotSaved,
-        LoseChangesWarn
+        LoseChangesWarn,
+        SolutionSaveWarning
     }
 
     public static class UserMessagesPool
@@ -176,6 +178,9 @@ namespace GingerCoreNET.ReporterLib
             Reporter.UserMessagesPool.Add(eUserMsgKeys.UpdateRepositoryItemUsagesSuccess, new UserMessage(eMessageType.INFO, "Update Repository Item Usages", "Finished to update the repository items usages." + Environment.NewLine + Environment.NewLine + "Note: Updates were not saved yet.", MessageBoxButton.OK, MessageBoxResult.None));
 
             Reporter.UserMessagesPool.Add(eUserMsgKeys.AskIfSureWantToDeLink, new UserMessage(eMessageType.WARN, "De-Link to Shared Repository", "Are you sure you want to de-link the item from it Shared Repository source item?", MessageBoxButton.YesNo, MessageBoxResult.No));
+
+            Reporter.UserMessagesPool.Add(eUserMsgKeys.SolutionSaveWarning, new UserMessage(eMessageType.WARN, "Save", "Note: save will include saving also changes which were done to: {0}." + System.Environment.NewLine + System.Environment.NewLine + "To continue with Save operation?", MessageBoxButton.YesNo, MessageBoxResult.No));
+
 
             Reporter.UserMessagesPool.Add(eUserMsgKeys.OfferToUploadAlsoTheActivityGroupToRepository, new UserMessage(eMessageType.QUESTION, "Add the " + GingerDicser.GetTermResValue(eTermResKey.ActivitiesGroup) + " to Repository", "The " + GingerDicser.GetTermResValue(eTermResKey.Activity) + " '{0}' is part of the " + GingerDicser.GetTermResValue(eTermResKey.ActivitiesGroup) + " '{1}', do you want to add the " + GingerDicser.GetTermResValue(eTermResKey.ActivitiesGroup) + " to the shared repository as well?" + System.Environment.NewLine + System.Environment.NewLine + "Note: If you select Yes, only the " + GingerDicser.GetTermResValue(eTermResKey.ActivitiesGroup) + " will be added to the repository and not all of it " + GingerDicser.GetTermResValue(eTermResKey.Activities) + ".", MessageBoxButton.YesNo, MessageBoxResult.No));
             #endregion Repository

@@ -28,6 +28,8 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using Amdocs.Ginger.Repository;
+using Ginger.Run;
+using Ginger.SolutionGeneral;
 
 namespace amdocs.ginger.GingerCoreNET
 {
@@ -196,7 +198,7 @@ namespace amdocs.ginger.GingerCoreNET
         //    UserProfile.Save(filename);
         //}
         public static IProjEnvironment ProjEnvironment;
-        public static IRunsetExecutor RunsetExecutor;
+        public static RunsetExecutor RunsetExecutor;
         public static Solution mSolution { get; set; }
         public static Solution Solution
         {
