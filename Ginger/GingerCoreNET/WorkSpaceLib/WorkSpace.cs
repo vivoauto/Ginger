@@ -19,6 +19,7 @@ limitations under the License.
 using Amdocs.Ginger.Common;
 using Amdocs.Ginger.Common.GeneralLib;
 using Amdocs.Ginger.Repository;
+using GingerCoreNET.GeneralLib;
 using GingerCoreNET.RunLib;
 using GingerCoreNET.SourceControl;
 using System;
@@ -38,6 +39,8 @@ namespace amdocs.ginger.GingerCoreNET
         // public UserProfile UserProfile;
 
         public SolutionRepository SolutionRepository;
+
+        public RecentSolutionManager RecentSolutionManager;
 
         // Will be back when we moved GR to GingerCoreNET
         // public GingerRunner GingerRunner;
@@ -146,7 +149,7 @@ namespace amdocs.ginger.GingerCoreNET
             }
         }
 
-        public string DefualtUserLocalWorkingFolder
+        public string DefaultUserLocalWorkingFolder
         {
             get
             {

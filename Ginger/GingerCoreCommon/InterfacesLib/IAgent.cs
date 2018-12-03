@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using GingerCoreNET.SolutionRepositoryLib.RepositoryObjectsLib.PlatformsLib;
 
 namespace Amdocs.Ginger.Common
 {
     public interface IAgent
     {
         string Name { get; }
+        ePlatformType Platform { get; }
     }
 }

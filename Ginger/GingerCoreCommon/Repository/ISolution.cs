@@ -17,6 +17,7 @@ limitations under the License.
 #endregion
 
 using System.Collections.Generic;
+using Amdocs.Ginger.Common;
 using GingerCore.Variables;
 using GingerCoreNET.SolutionRepositoryLib.RepositoryObjectsLib.PlatformsLib;
 
@@ -25,15 +26,23 @@ namespace Amdocs.Ginger.Repository
     public interface ISolution
     {
         string Name { get; set; }
+
         string Folder { get; set; }
+
         IEnumerable<VariableBase> Variables { get; }
+
         string MainApplication { get; }
-        object ExecutionLoggerConfigurationSetList { get; }
-        object RecentlyUsedBusinessFlows { get; }
+
+        ObservableList<IExecutionLoggerConfiguration> ExecutionLoggerConfigurationSetList { get; }
+
+        //MRUManager RecentlyUsedBusinessFlows { get; }
+
         string LastBusinessFlowFileName { get; set; }
+
         IEnumerable<ApplicationPlatform> ApplicationPlatforms { get; }
 
         ISolution LoadSolution(string solutionFile, bool v);
+
         void SetReportsConfigurations();
     }
 }

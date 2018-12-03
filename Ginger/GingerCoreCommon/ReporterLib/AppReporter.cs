@@ -36,7 +36,7 @@ namespace Amdocs.Ginger.Common
             }
         }
 
-        internal static void ToLog(eAppReporterLogLevel logLevel, string logMessage, Exception exceptionToRecord = null, bool logOnlyOnDebugMode=false)
+        public static void ToLog(eAppReporterLogLevel logLevel, string logMessage, Exception exceptionToRecord = null, bool logOnlyOnDebugMode=false)
         {
             OnReportEvent(reportType: eAppReportType.ToLog, reportMessage: logMessage, reportLogLevel: logLevel, reportExceptionToRecord: exceptionToRecord, logOnlyOnDebugMode: logOnlyOnDebugMode);
         }

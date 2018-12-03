@@ -27,7 +27,7 @@ using GingerExternal;
 
 namespace GingerCore
 {
-    public class EncryptionHandler
+    public class EncryptionHandler : IEncryptionHandler
     {
         //Configuring the details to create the Encrypt key
         private static string PASS_PHRASE =Encoding.UTF8.GetString(System.Convert.FromBase64String(ExtraInfo.getInfo().ElementAt(0)));
@@ -36,6 +36,12 @@ namespace GingerCore
         private static string HASH_ALGORITHM = Encoding.UTF8.GetString(System.Convert.FromBase64String(ExtraInfo.getInfo().ElementAt(3)));
         private static int PASSWORD_ITERATIONS = 3; // can be any number
         private static int KEY_SIZE = 128; // can be 192 or 256
+
+
+        string IEncryptionHandler.EncryptString(string strToEncrypt, ref bool result)
+        {
+            return EncryptionHandler.EncryptString(strToEncrypt, ref result);
+        }
 
         public static string EncryptString(string strToEncrypt, ref bool result)
         {
@@ -102,7 +108,13 @@ namespace GingerCore
                     return string.Empty;
                 }
             }
-        }        
+        }
+
+
+        string IEncryptionHandler.DecryptString(string strToEncrypt, ref bool result)
+        {
+            return EncryptionHandler.DecryptString(strToEncrypt, ref result);
+        }
 
         public static string DecryptString(string strToDecrypt, ref bool result)
         {
@@ -227,6 +239,7 @@ namespace GingerCore
         {
             var encryptedBytes = Convert.FromBase64String(encryptedText);
             return Encoding.UTF8.GetString(Decrypt(encryptedBytes, GetRijndaelManaged(key)));
-        }        
+        }
+
     }
 }

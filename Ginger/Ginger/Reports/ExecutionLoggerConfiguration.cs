@@ -22,7 +22,7 @@ using GingerCore;
 
 namespace Ginger.Reports
 {
-    public class ExecutionLoggerConfiguration : RepositoryItemBase
+    public class ExecutionLoggerConfiguration : RepositoryItemBase, IExecutionLoggerConfiguration
     {
         public enum AutomationTabContext
         {

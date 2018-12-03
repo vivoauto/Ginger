@@ -331,20 +331,20 @@ namespace Ginger.SolutionGeneral
         [IsSerializedForLocalRepository]
         public string LastBusinessFlowFileName { get; set; }
 
-        MRUManager mRecentUsedBusinessFlows;
+        //MRUManager mRecentUsedBusinessFlows;
 
-        public MRUManager RecentlyUsedBusinessFlows
-        {
-            get
-            {
-                if (mRecentUsedBusinessFlows == null)
-                {
-                    mRecentUsedBusinessFlows = new MRUManager();
-                    mRecentUsedBusinessFlows.Init(Path.Combine(Folder, "RecentlyUsed.dat"));
-                }
-                return mRecentUsedBusinessFlows;
-            }
-        }
+        //public MRUManager RecentlyUsedBusinessFlows
+        //{
+        //    get
+        //    {
+        //        if (mRecentUsedBusinessFlows == null)
+        //        {
+        //            mRecentUsedBusinessFlows = new MRUManager();
+        //            mRecentUsedBusinessFlows.Init(Path.Combine(Folder, "RecentlyUsed.dat"));
+        //        }
+        //        return mRecentUsedBusinessFlows;
+        //    }
+        //}
 
         // Need to be tree view
         public override string GetNameForFileName() { return Name; }

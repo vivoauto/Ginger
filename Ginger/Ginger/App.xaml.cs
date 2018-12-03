@@ -58,6 +58,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Threading;
 using System.Windows.Input;
+using GingerCoreNET.GeneralLib;
 
 [assembly: log4net.Config.XmlConfigurator(Watch = true)]
 
@@ -249,7 +250,7 @@ namespace Ginger
                     }
                     UserProfile.RecentBusinessFlow = App.BusinessFlow.Guid;
                     UserProfile.Solution.LastBusinessFlowFileName = mBusinessFlow.FileName;
-                    AddLastUsedBusinessFlow(mBusinessFlow);
+                    //AddLastUsedBusinessFlow(mBusinessFlow);
                 }
 
                 App.AutomateTabGingerRunner.BusinessFlows.Clear();
@@ -262,14 +263,14 @@ namespace Ginger
             }
         }
 
-        private static void AddLastUsedBusinessFlow(BusinessFlow BF)
-        {
-            if (BF != null)
-            {
-                App.UserProfile.Solution.RecentlyUsedBusinessFlows.AddItem(BF.FileName);
-                App.UserProfile.SaveUserProfile();
-            }
-        }
+        //private static void AddLastUsedBusinessFlow(BusinessFlow BF)
+        //{
+        //    if (BF != null)
+        //    {
+        //        App.UserProfile.Solution.RecentlyUsedBusinessFlows.AddItem(BF.FileName);
+        //        App.UserProfile.SaveUserProfile();
+        //    }
+        //}
 
 
         //public static string LocalApplicationData
@@ -436,7 +437,6 @@ namespace Ginger
             //--Canceling customize tooltip for now due to many issues and no real added value            
 
             mIsReady = true;
-
         }
 
         private static void StandAloneThreadExceptionHandler(object sender, UnhandledExceptionEventArgs e)
@@ -738,7 +738,9 @@ namespace Ginger
                             Reporter.ToLog(eAppReporterLogLevel.ERROR, "Error occurred while checking if Solution files should be Upgraded", ex);
                         }
 
-                        App.UserProfile.AddSolutionToRecent(sol);
+                        //App.UserProfile.AddSolutionToRecent(sol);
+                        WorkSpace.Instance.RecentSolutionManager.AddSolutionToRecent(sol);
+
                     }
                     else
                     {
