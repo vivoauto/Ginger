@@ -34,4 +34,8 @@
     <PackageReference Include="System.Drawing.Common" Version="4.5.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="UserLib\" />
+  </ItemGroup>
+
 </Project>

@@ -49,13 +49,7 @@ namespace Ginger
             View = 5 //item should be open for read only
 
         }
-
-        public static bool isDesignMode()
-        {
-            //TODO: move this func to General
-            bool designMode = (LicenseManager.UsageMode == LicenseUsageMode.Designtime);
-            return designMode;
-        }       
+     
 
         public static string ConvertSolutionRelativePath(string fileName)
         {

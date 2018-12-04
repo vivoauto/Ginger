@@ -341,6 +341,15 @@ namespace GingerCoreNET.GeneralLib
                 ObservableList.Add(o);
             return ObservableList;
         }
+
+
+        public static bool isDesignMode()
+        {
+            //TODO: move this func to General
+            bool designMode = (LicenseManager.UsageMode == LicenseUsageMode.Designtime);
+            return designMode;
+        }
+
     }
 }
 
