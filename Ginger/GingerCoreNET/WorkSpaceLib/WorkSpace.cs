@@ -25,6 +25,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
+using TimeLineControl;
 
 namespace amdocs.ginger.GingerCoreNET
 {
@@ -58,6 +59,9 @@ namespace amdocs.ginger.GingerCoreNET
                 return mPluginsManager;
             }
         }
+
+        TimeLineEvents TimeLineEvents = new TimeLineEvents();
+        public bool LogTimeLineEvents = false;
 
         // Here we will have knwon GingerGrids - !!!!!!!!!!!!!!!!!!! Design, think..........
         // public IObservable<GingerGrid> GingerGrids;
@@ -308,6 +312,8 @@ namespace amdocs.ginger.GingerCoreNET
                 }
             }
         }
+
+
 
 
     }

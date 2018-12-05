@@ -47,6 +47,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using TimeLineControl;
 using static Amdocs.Ginger.CoreNET.RunLib.NodeActionOutputValue;
 
 //   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -732,9 +733,14 @@ namespace Ginger.Run
             return result;
         }
 
-
+        TimeLineEvent ActionTimeLineEvent;
         public void RunAction(Act act, bool checkIfActionAllowedToRun = true, bool standaloneExecution = false)
         {
+            if (WorkSpace.Instance.LogTimeLineEvents)
+            {
+                ActionTimeLineEvent = TimeLineEvent.StartNew("Action", act.Description);
+                ActivityTimeLineEvent.AddSubEvent(ActionTimeLineEvent);
+            }
             try
             {
                 //init
@@ -779,7 +785,11 @@ namespace Ginger.Run
                     mIsRunning = false;
                 }
                 act.OnPropertyChanged(nameof(Act.ReturnValuesInfo));
-                OnGingerRunnerEvent(GingerRunnerEventArgs.eEventType.ActionEnd, null);               
+                OnGingerRunnerEvent(GingerRunnerEventArgs.eEventType.ActionEnd, null);
+                if (WorkSpace.Instance.LogTimeLineEvents)
+                {
+                    ActionTimeLineEvent.Stop();
+                }
             }
         }
 
@@ -817,36 +827,48 @@ namespace Ginger.Run
             //DebugStopWatch.Reset();
             //DebugStopWatch.Start();
             //Not suppose to happen but just in case
-            
-                if (act == null)
+
+            if (act == null)
+            {
+                Reporter.ToUser(eUserMsgKeys.AskToSelectAction);
+                return;
+            }
+
+            if (checkIfActionAllowedToRun)//to avoid duplicate checks in case the RunAction function is called from RunActvity
+            {
+                if (!act.Active)
                 {
-                    Reporter.ToUser(eUserMsgKeys.AskToSelectAction);
+                    ResetAction(act);
+                    act.Status = Amdocs.Ginger.CoreNET.Execution.eRunStatus.Skipped;
+                    act.ExInfo = "Action is not active.";
                     return;
                 }
+                if (act.CheckIfVaribalesDependenciesAllowsToRun(CurrentBusinessFlow.CurrentActivity, true) == false)
+                    return;
+            }
+            if (act.BreakPoint)
+            {
+                StopRun();
+            }
+            if (mStopRun) return;
+            eActionExecutorType ActionExecutorType = eActionExecutorType.RunWithoutDriver;
+            Stopwatch st = new Stopwatch();
+            st.Start();
 
-                if (checkIfActionAllowedToRun)//to avoid duplicate checks in case the RunAction function is called from RunActvity
-                {
-                    if (!act.Active)
-                    {
-                        ResetAction(act);
-                        act.Status = Amdocs.Ginger.CoreNET.Execution.eRunStatus.Skipped;
-                        act.ExInfo = "Action is not active.";
-                        return;
-                    }
-                    if (act.CheckIfVaribalesDependenciesAllowsToRun(CurrentBusinessFlow.CurrentActivity, true) == false)
-                        return;
-                }
-                if (act.BreakPoint)
-                {
-                    StopRun();
-                }
-                if (mStopRun) return;
-                eActionExecutorType ActionExecutorType = eActionExecutorType.RunWithoutDriver;
-                Stopwatch st = new Stopwatch();
-                st.Start();
-
+            TimeLineEvent PrepActionTimeLineEvent;
+            if (WorkSpace.Instance.LogTimeLineEvents)
+            {
+                PrepActionTimeLineEvent = TimeLineEvent.StartNew("Prep Action", act.Description);
+                ActionTimeLineEvent.AddSubEvent(PrepActionTimeLineEvent);
                 PrepAction(act, ref ActionExecutorType, st);
+                PrepActionTimeLineEvent.Stop();
+            }
+            else
+            {
+                PrepAction(act, ref ActionExecutorType, st);
+            }
 
+           
                 if (mStopRun)
                 {
                     return;
@@ -857,7 +879,14 @@ namespace Ginger.Run
 
                 while (act.Status != Amdocs.Ginger.CoreNET.Execution.eRunStatus.Passed)
                 {
+
+                    TimeLineEvent RunActionWithTimeOutControlTimeLineEvent = TimeLineEvent.StartNew("RunActionWithTimeOutControl", act.Description);
+                    ActionTimeLineEvent.AddSubEvent(RunActionWithTimeOutControlTimeLineEvent);
+
                     RunActionWithTimeOutControl(act, ActionExecutorType);
+
+                    RunActionWithTimeOutControlTimeLineEvent.Stop();
+
                     CalculateActionFinalStatus(act);
                     // fetch all pop-up handlers
                     ObservableList<ErrorHandler> lstPopUpHandlers = GetAllErrorHandlersByType(ErrorHandler.eHandlerType.Popup_Handler);
@@ -899,8 +928,10 @@ namespace Ginger.Run
                 // Add time stamp 
                 act.ExInfo = DateTime.Now.ToString() + " - " + act.ExInfo;
 
+                TimeLineEvent ProcessScreenShotActionTimeLineEvent = TimeLineEvent.StartNew("Process Screenshot", act.Description);
+                ActionTimeLineEvent.AddSubEvent(ProcessScreenShotActionTimeLineEvent);
                 ProcessScreenShot(act, ActionExecutorType);
-
+                ProcessScreenShotActionTimeLineEvent.Stop();
 
                 mErrorHandlerExecuted = false;
                 try
@@ -1276,6 +1307,9 @@ namespace Ginger.Run
 
         private void UpdateActionStatus(Act act, Amdocs.Ginger.CoreNET.Execution.eRunStatus eStatus, Stopwatch st)
         {
+            TimeLineEvent UpdateActionStatusTimeLineEvent = TimeLineEvent.StartNew("UpdateActionStatus", act.Description);
+            ActionTimeLineEvent.AddSubEvent(UpdateActionStatusTimeLineEvent);
+
             act.Status = eStatus;
             act.Elapsed = st.ElapsedMilliseconds;
             act.ElapsedTicks = st.ElapsedTicks;
@@ -1285,6 +1319,8 @@ namespace Ginger.Run
                 OnGingerRunnerEvent(GingerRunnerEventArgs.eEventType.DoEventsRequired, null);
                 Thread.Sleep(10);
             }
+
+            UpdateActionStatusTimeLineEvent.Stop();
         }
 
         private void executeErrorAndPopUpHandler(ObservableList<ErrorHandler> errorHandlerActivity)
@@ -2549,8 +2585,12 @@ namespace Ginger.Run
             return result;
         }
 
+
+        TimeLineEvent ActivityTimeLineEvent;
         public void RunActivity(Activity Activity, bool doContinueRun = false)
         {
+            ActivityTimeLineEvent = TimeLineEvent.StartNew("Activity", Activity.ActivityName);
+            BFTimeLineEvent.AddSubEvent(ActivityTimeLineEvent);
             bool statusCalculationIsDone = false;
 
             //check if Activity is allowed to run
@@ -2776,6 +2816,7 @@ namespace Ginger.Run
                 }
 
                 OnGingerRunnerEvent(GingerRunnerEventArgs.eEventType.ActivityEnd, null);
+                ActivityTimeLineEvent.Stop();
             }
         }
 
@@ -2963,9 +3004,15 @@ namespace Ginger.Run
             return result;
         }
 
+        TimeLineEvents timeLineEvents = new TimeLineEvents();
+        TimeLineEvent BFTimeLineEvent;
         public void RunBusinessFlow(BusinessFlow businessFlow, bool standaloneExecution = false, bool doContinueRun = false)
         {
-           Stopwatch st = new Stopwatch();
+            TimeLineEvents.Stopwatch.Start();
+            BFTimeLineEvent = TimeLineEvent.StartNew("BusinessFlow", CurrentBusinessFlow.Name);
+            timeLineEvents.AddEvent(BFTimeLineEvent);
+
+            Stopwatch st = new Stopwatch();
             try
             {
                 //set Runner details if running in stand alone mode (Automate tab)
@@ -3141,6 +3188,10 @@ namespace Ginger.Run
                 }
                 OnGingerRunnerEvent(GingerRunnerEventArgs.eEventType.BusinessFlowEnd, null);
                 AutoLogProxy.LogBusinessFlow(CurrentBusinessFlow);
+                BFTimeLineEvent.Stop();
+
+                // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                timeLineEvents.SaveTofile(@"c:\temp\Ginger\BFTimeLine.txt");
             }
         }
 
