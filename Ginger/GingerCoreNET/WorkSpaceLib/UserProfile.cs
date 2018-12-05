@@ -456,7 +456,7 @@ namespace Ginger
         public void LoadDefaults()
         {
             AutoLoadLastSolution = true; //#Task 160            
-            string defaultFolder = WorkSpace.Instance.DefualtUserLocalWorkingFolder;//calling it so it will be created
+            string defaultFolder = WorkSpace.Instance.DefaultUserLocalWorkingFolder;//calling it so it will be created
         }
                
         internal string GetDefaultReport()

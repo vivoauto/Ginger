@@ -19,6 +19,7 @@ limitations under the License.
 using System;
 using System.Xml;
 using Amdocs.Ginger.Common;
+using GingerCore;
 
 namespace Ginger.UserConfig
 {
