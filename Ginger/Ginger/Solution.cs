@@ -36,7 +36,7 @@ using System.Text;
 
 namespace Ginger.SolutionGeneral
 {
-    public class Solution : RepositoryItemBase
+    public class Solution : RepositoryItemBase, ISolution
     {
         public SourceControlBase SourceControl { get; set; }
 
@@ -47,6 +47,11 @@ namespace Ginger.SolutionGeneral
         public Solution()
         {
             Tags = new ObservableList<RepositoryItemTag>();
+        }
+
+        public SourceControlBase GetSourceControl()
+        {
+            return SourceControl;
         }
 
         public static Solution LoadSolution(string solutionFileName, bool startDirtyTracking= true)

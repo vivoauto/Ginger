@@ -20,6 +20,7 @@ using System.Collections.Generic;
 using Amdocs.Ginger.Common;
 using GingerCore.Variables;
 using GingerCoreNET.SolutionRepositoryLib.RepositoryObjectsLib.PlatformsLib;
+using GingerCoreNET.SourceControl;
 
 namespace Amdocs.Ginger.Repository
 {
@@ -40,6 +41,8 @@ namespace Amdocs.Ginger.Repository
         string LastBusinessFlowFileName { get; set; }
 
         IEnumerable<ApplicationPlatform> ApplicationPlatforms { get; }
+
+        public SourceControlBase GetSourceControl();
 
         ISolution LoadSolution(string solutionFile, bool v);
 
