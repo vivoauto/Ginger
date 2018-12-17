@@ -58,7 +58,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Threading;
 using System.Windows.Input;
-using GingerCoreNET.GeneralLib;
+using Amdocs.Ginger.Common.Repository;
 
 [assembly: log4net.Config.XmlConfigurator(Watch = true)]
 
@@ -250,7 +250,7 @@ namespace Ginger
                     }
                     UserProfile.RecentBusinessFlow = App.BusinessFlow.Guid;
                     UserProfile.Solution.LastBusinessFlowFileName = mBusinessFlow.FileName;
-                    //AddLastUsedBusinessFlow(mBusinessFlow);
+                    AddLastUsedBusinessFlow(mBusinessFlow);
                 }
 
                 App.AutomateTabGingerRunner.BusinessFlows.Clear();
@@ -263,14 +263,14 @@ namespace Ginger
             }
         }
 
-        //private static void AddLastUsedBusinessFlow(BusinessFlow BF)
-        //{
-        //    if (BF != null)
-        //    {
-        //        App.UserProfile.Solution.RecentlyUsedBusinessFlows.AddItem(BF.FileName);
-        //        App.UserProfile.SaveUserProfile();
-        //    }
-        //}
+        private static void AddLastUsedBusinessFlow(BusinessFlow BF)
+        {
+            if (BF != null)
+            {
+                App.UserProfile.Solution.RecentlyUsedBusinessFlows.AddItem(BF.FileName);
+                App.UserProfile.SaveUserProfile();
+            }
+        }
 
 
         //public static string LocalApplicationData
@@ -439,6 +439,7 @@ namespace Ginger
             //--Canceling customize tooltip for now due to many issues and no real added value            
 
             mIsReady = true;
+
         }
 
         private static void StandAloneThreadExceptionHandler(object sender, UnhandledExceptionEventArgs e)
@@ -454,7 +455,11 @@ namespace Ginger
             }
             Reporter.ToLog(eAppReporterLogLevel.FATAL, ">>>>>>>>>>>>>> Error occurred on stand alone thread(non UI) - " + e.ExceptionObject);
             //Reporter.ToUser(eUserMsgKeys.ThreadError, "Error occurred on stand alone thread - " + e.ExceptionObject.ToString());
-            App.AppSolutionAutoSave.DoAutoSave();
+
+            if (App.RunningFromConfigFile == false)
+            {
+                App.AppSolutionAutoSave.DoAutoSave();
+            }
 
             /// if (e.IsTerminating)...
             /// 
@@ -664,8 +669,11 @@ namespace Ginger
                 OnPropertyChanged(nameof(LoadingSolution));
 
                 // Cleanup last loaded solution 
-                //WorkSpace.Instance.LocalGingerGrid.Reset();  //Temp
-                AppSolutionAutoSave.SolutionAutoSaveEnd();
+                WorkSpace.Instance.LocalGingerGrid.Reset();  //Clear the grid
+                if (!App.RunningFromConfigFile)
+                {
+                    AppSolutionAutoSave.SolutionAutoSaveEnd();
+                }
 
                 //Cleanup
                 SolutionCleanup();
@@ -711,7 +719,7 @@ namespace Ginger
                         ValueExpression.SolutionFolder = SolutionFolder;
                         BusinessFlow.SolutionVariables = sol.Variables;
 
-                        App.UserProfile.Solution = (ISolution) sol;
+                        App.UserProfile.Solution = sol;
                         App.UserProfile.Solution.SetReportsConfigurations();
                         App.UserProfile.LoadRecentAppAgentMapping();
                         AutoLogProxy.SetAccount(sol.Account);
@@ -741,9 +749,7 @@ namespace Ginger
                             Reporter.ToLog(eAppReporterLogLevel.ERROR, "Error occurred while checking if Solution files should be Upgraded", ex);
                         }
 
-                        //App.UserProfile.AddSolutionToRecent(sol);
-                        WorkSpace.Instance.RecentSolutionManager.AddSolutionToRecent(sol);
-
+                        App.UserProfile.AddSolutionToRecent(sol);
                     }
                     else
                     {
@@ -950,8 +956,8 @@ namespace Ginger
             a.Acts = new ObservableList<Act>();
             if (biz.TargetApplications.Count > 0)
             {
-                a.TargetApplication = biz.TargetApplications[0].AppName;
-            }
+                a.TargetApplication = biz.TargetApplications[0].Name;
+            }                
             biz.Activities.Add(a);
 
             biz.Activities.CurrentItem = a;
@@ -994,7 +1000,7 @@ namespace Ginger
                     {
                         // take it from solution main platform
                         if (App.BusinessFlow.TargetApplications == null)
-                            App.BusinessFlow.TargetApplications = new ObservableList<TargetApplication>();
+                            App.BusinessFlow.TargetApplications = new ObservableList<TargetBase>();
 
                         App.BusinessFlow.TargetApplications.Add(new TargetApplication() { AppName = App.UserProfile.Solution.MainApplication });
                     }
@@ -1092,6 +1098,8 @@ namespace Ginger
                 App.BusinessFlow.SaveBackup();
             }
         }
+
+        
 
     }
 }

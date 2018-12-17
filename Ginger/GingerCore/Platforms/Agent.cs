@@ -16,6 +16,7 @@ limitations under the License.
 */
 #endregion
 
+using amdocs.ginger.GingerCoreNET;
 using Amdocs.Ginger.Common;
 using Amdocs.Ginger.Common.Enums;
 using Amdocs.Ginger.Common.Repository;
@@ -36,14 +37,17 @@ using GingerCore.Drivers.PBDriver;
 using GingerCore.Drivers.WebServicesDriverLib;
 using GingerCore.Drivers.WindowsLib;
 using GingerCore.Environments;
+using GingerCoreNET.RunLib;
 using GingerCoreNET.SolutionRepositoryLib.RepositoryObjectsLib.PlatformsLib;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using amdocs.ginger.GingerCoreNET;
 
 namespace GingerCore
 {
@@ -53,9 +57,23 @@ namespace GingerCore
     //
     //   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-    public class Agent : RepositoryItemBase, IAgent
+    public class Agent : RepositoryItemBase
     {
         
+        public enum eAgentType
+        {
+            Driver,  // old legacy drivers - default
+            Service // new Plugin Service driver with session
+        }
+
+        [IsSerializedForLocalRepository]
+        public eAgentType AgentType { get; set; }
+
+        [IsSerializedForLocalRepository]
+        public string PluginId { get; set; }   // only for AgentType plugin
+
+        [IsSerializedForLocalRepository]
+        public string ServiceId { get; set; }   // only for AgentType plugin
 
         public enum eDriverType
         {
@@ -114,8 +132,14 @@ namespace GingerCore
             MobileAppiumAndroidBrowser,
             [Description("Mobile Appium IOS Browser")]
             MobileAppiumIOSBrowser,
-            [Description("Perfecto Mobile")]
-            PerfectoMobile,
+            [Description("Mobile Perfecto Android")]
+            PerfectoMobileAndroid,
+            [Description("Mobile Perfecto Android Browser")]
+            PerfectoMobileAndroidWeb,
+            [Description("Mobile Perfecto IOS")]
+            PerfectoMobileIOS,
+            [Description("Mobile Perfecto IOS Browser")]
+            PerfectoMobileIOSWeb,
 
             //Java
             [Description("Java")]
@@ -128,7 +152,7 @@ namespace GingerCore
             //Android
             [Description("Android ADB")]
             AndroidADB,
-            NA
+            NA    
         }
 
         public enum eStatus
@@ -142,14 +166,28 @@ namespace GingerCore
             FailedToStart
         }
 
+        public static class Fields
+        {
+            public static string Guid = "Guid";
+            public static string Active = "Active";
+            public static string Name = "Name";
+            public static string Host = "Host";
+            public static string Port = "Port";
+            public static string Status = "Status";
+            public static string DriverType = "DriverType";
+            public static string Remote = "Remote";
+            public static string Notes = "Notes";
+            public static string Platform = "Platform";
+            public static string IsWindowExplorerSupportReady = "IsWindowExplorerSupportReady";
+        }
+
         public bool IsWindowExplorerSupportReady
         {
             get
             {
-                if (Driver != null)
-                    return  Driver.IsWindowExplorerSupportReady();
-                else
-                    return false;
+                if (Driver != null) return  Driver.IsWindowExplorerSupportReady();
+
+                else return false;
             }
         }
 
@@ -157,10 +195,9 @@ namespace GingerCore
         {
             get
             {
-                if (Driver != null)
-                    return Driver.IsShowWindowExplorerOnStart();
-                else
-                    return false;
+                if (Driver != null) return Driver.IsShowWindowExplorerOnStart();
+
+                else return false;
             }
         }
         
@@ -182,7 +219,7 @@ namespace GingerCore
                 if (mName != value)
                 {
                     mName = value;
-                    OnPropertyChanged(nameof(Name));
+                    OnPropertyChanged(Fields.Name);
                 }
             }
         }
@@ -227,10 +264,23 @@ namespace GingerCore
         public eStatus Status
         {
             get
-            {
+            {                
                 if (IsFailedToStart) return eStatus.FailedToStart;
 
                 if (mIsStarting) return eStatus.Starting;
+
+                if (AgentType == eAgentType.Service)
+                {
+                    if (mGingerNodeInfo != null)
+                    {
+                        return eStatus.Running;
+                    }
+                    else
+                    {
+                        return eStatus.NotStarted;
+                    }
+                }
+                
 
                 if (Driver == null) return eStatus.NotStarted;
                 //TODO: fixme  running called too many - and get stuck
@@ -289,14 +339,14 @@ namespace GingerCore
             }
         }
 
-        private Task MSTATask;  // For STA Driver we keep the STA task 
-        private CancellationTokenSource CTS;
+        private Task MSTATask = null;  // For STA Driver we keep the STA task 
+        private CancellationTokenSource CTS = null;
         BackgroundWorker CancelTask;
 
         public void StartDriver()
         {
             mIsStarting = true;
-            OnPropertyChanged(nameof(Status));
+            OnPropertyChanged(Fields.Status);
             try
             {
                 try
@@ -363,8 +413,17 @@ namespace GingerCore
                             case eDriverType.MobileAppiumIOSBrowser:
                                 Driver = new SeleniumAppiumDriver(SeleniumAppiumDriver.eSeleniumPlatformType.iOSBrowser, BusinessFlow);
                                 break;
-                            case eDriverType.PerfectoMobile:
-                                Driver = new PerfectoDriver(BusinessFlow);
+                            case eDriverType.PerfectoMobileAndroid:
+                                Driver = new PerfectoDriver(PerfectoDriver.eContextType.NativeAndroid, BusinessFlow);
+                                break;
+                            case eDriverType.PerfectoMobileAndroidWeb:
+                                Driver = new PerfectoDriver(PerfectoDriver.eContextType.WebAndroid, BusinessFlow);
+                                break;
+                            case eDriverType.PerfectoMobileIOS:
+                                Driver = new PerfectoDriver(PerfectoDriver.eContextType.NativeIOS, BusinessFlow);
+                                break;
+                            case eDriverType.PerfectoMobileIOSWeb:
+                                Driver = new PerfectoDriver(PerfectoDriver.eContextType.WebIOS, BusinessFlow);
                                 break;
 
                             case eDriverType.WebServices:
@@ -404,9 +463,8 @@ namespace GingerCore
                                     //TODO: Load create sample folder/device, or start the wizard
                                     throw new Exception("Please set device config folder");
                                 }
-                                break;
-
-                                //TODO: default mess
+                                break;                            
+                            //TODO: default mess
                         }
                     }
                 }
@@ -414,40 +472,98 @@ namespace GingerCore
                 {                    
                     Reporter.ToUser(eUserMsgKeys.FailedToConnectAgent, Name, e.Message);
                 }
-                Driver.BusinessFlow = this.BusinessFlow;            
-                SetDriverConfiguration();
 
-                //if STA we need to start it on seperate thread, so UI/Window can be refreshed: Like IB, Mobile, Unix
-                if (Driver.IsSTAThread())
-                {
-                    CTS = new CancellationTokenSource();
-
-                    MSTATask = new Task(() => { Driver.StartDriver(); }, CTS.Token, TaskCreationOptions.LongRunning);                  
-                    MSTATask.Start();                   
+                if (AgentType == eAgentType.Service)
+                {                    
+                    StartPluginService();
+                    OnPropertyChanged(Fields.Status);
                 }
                 else
-                {
-                    Driver.StartDriver();
+                {                   
+                    Driver.BusinessFlow = this.BusinessFlow;
+                    SetDriverConfiguration();
+
+                    //if STA we need to start it on seperate thread, so UI/Window can be refreshed: Like IB, Mobile, Unix
+                    if (Driver.IsSTAThread())
+                    {
+                        CTS = new CancellationTokenSource();
+
+                        MSTATask = new Task(() => { Driver.StartDriver(); }, CTS.Token, TaskCreationOptions.LongRunning);
+                        MSTATask.Start();
+                    }
+                    else
+                    {
+                        Driver.StartDriver();
+                    }
                 }
             }
             finally
             {
-                // Give the driver time to start            
-                Thread.Sleep(500);
-                mIsStarting = false;
-                Driver.IsDriverRunning = true;
-                OnPropertyChanged(nameof(Status));
-                Driver.driverMessageEventHandler += driverMessageEventHandler;
-                OnPropertyChanged(nameof(IsWindowExplorerSupportReady));
+                if (AgentType == eAgentType.Service)
+                {
+                    mIsStarting = false;                    
+                }
+                else
+                {
+                    // Give the driver time to start            
+                    Thread.Sleep(500);
+                    mIsStarting = false;
+                    Driver.IsDriverRunning = true;
+                    OnPropertyChanged(Fields.Status);
+                    Driver.driverMessageEventHandler += driverMessageEventHandler;
+                    OnPropertyChanged(Fields.IsWindowExplorerSupportReady);
+                }
             }
         }
 
-        
+
+        System.Diagnostics.Process mProcess;
+        private void StartPluginService()
+        {
+
+            /// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< MyDriver
+            // Find the first service which match
+            mGingerNodeInfo = (from x in WorkSpace.Instance.LocalGingerGrid.NodeList where x.ServiceId == "SeleniumChromeDriver" select x).FirstOrDefault();  // Keep First!!!
+
+            // Service not found start new one
+            // Add plugin config start if not exist and more depeneds on the config 
+            if (mGingerNodeInfo == null)
+            {
+                // Dup with GR consolidate with timeout
+                mProcess = WorkSpace.Instance.PlugInsManager.StartService(PluginId);    
+            }
+
+            Stopwatch st = Stopwatch.StartNew();
+            while (mGingerNodeInfo == null && st.ElapsedMilliseconds < 30000) // max 30 seconds to wait
+            {
+
+                //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+                mGingerNodeInfo = (from x in WorkSpace.Instance.LocalGingerGrid.NodeList where x.ServiceId == "SeleniumChromeDriver" select x).FirstOrDefault();  // Keep First!!!
+                if (mGingerNodeInfo != null) break;
+                Thread.Sleep(100);
+            }
+
+            if (mGingerNodeInfo == null)
+            {
+                throw new Exception("Plugin not started " + PluginId);
+            }
+
+
+            mGingerNodeInfo.Status = GingerNodeInfo.eStatus.Reserved;
+            // TODO: add by which agent to GNI
+
+            // Keep GNP on agent
+            GingerNodeProxy GNP = new GingerNodeProxy(mGingerNodeInfo);
+            GNP.GingerGrid = WorkSpace.Instance.LocalGingerGrid;
+            GNP.StartDriver();
+        }
+
         private void driverMessageEventHandler(object sender, DriverMessageEventArgs e)
         {
             if (e.DriverMessageType == DriverBase.eDriverMessageType.DriverStatusChanged)
             {
-                OnPropertyChanged(nameof(Status));
+                OnPropertyChanged(Fields.Status);
             }
         }
 
@@ -581,7 +697,10 @@ namespace GingerCore
                 case Agent.eDriverType.AndroidADB:
                     SetDriverDefualtParams(typeof(AndroidADBDriver));
                     break;
-                case Agent.eDriverType.PerfectoMobile:
+                case Agent.eDriverType.PerfectoMobileAndroid:
+                case Agent.eDriverType.PerfectoMobileAndroidWeb:
+                case Agent.eDriverType.PerfectoMobileIOS:
+                case Agent.eDriverType.PerfectoMobileIOSWeb:
                     SetDriverDefualtParams(typeof(PerfectoDriver));
                     break;
                 default:
@@ -612,22 +731,37 @@ namespace GingerCore
                 DriverConfiguration.Add(DCP);
             }
         }
-        
+       
+        // keep GingerNodeProxy here
+
+        // We keep the GingerNodeInfo for Plugin driver
+        private GingerNodeInfo mGingerNodeInfo;
+        public GingerNodeInfo GingerNodeInfo
+        {
+            get
+            {
+                return mGingerNodeInfo;
+            }
+            set { mGingerNodeInfo = value;
+            }
+        }
+
+
         public void RunAction(Act act)
         {          
             try
-            {
-                if (Driver.IsSTAThread())
-                {
-                    Driver.Dispatcher.Invoke(() =>
+            {              
+                    if (Driver.IsSTAThread())
+                    {
+                        Driver.Dispatcher.Invoke(() =>
+                        {
+                            Driver.RunAction(act);
+                        });
+                    }
+                    else
                     {
                         Driver.RunAction(act);
-                    });
-                }
-                else
-                {
-                    Driver.RunAction(act);
-                }        
+                    }              
             }
             catch (Exception ex)
             {
@@ -645,10 +779,28 @@ namespace GingerCore
         {
             try
             {
-                if (Driver == null)
+                if (AgentType == eAgentType.Service)
                 {
-                    return;
+                    if (mGingerNodeInfo != null)
+                    {
+                        // this is plugin driver
+                        GingerNodeProxy GNP = new GingerNodeProxy(mGingerNodeInfo);
+                        GNP.GingerGrid = WorkSpace.Instance.LocalGingerGrid;
+                        GNP.CloseDriver();
+                        if (mProcess != null)
+                        {
+                            // mProcess.Kill();
+                            //mProcess.Close();
+                            //GingerCore.General.DoEvents();
+                            mProcess.CloseMainWindow();
+                        }
+                        mGingerNodeInfo = null;
+                        // GNP.Shutdown();
+                        return;
+                    }
                 }
+                if (Driver == null) return;
+
                 Driver.IsDriverRunning = false;                
                 if (Driver.Dispatcher != null)
                 {
@@ -676,8 +828,8 @@ namespace GingerCore
             }
             finally
             {
-                OnPropertyChanged(nameof(Status));
-                OnPropertyChanged(nameof(IsWindowExplorerSupportReady));
+                OnPropertyChanged(Fields.Status);
+                OnPropertyChanged(Fields.IsWindowExplorerSupportReady);
             }
         }
 
@@ -714,7 +866,14 @@ namespace GingerCore
         { 
             get 
             {
-                return GetDriverPlatformType(DriverType);
+                if (AgentType == eAgentType.Service)
+                {
+                    return ePlatformType.NA;
+                }
+                else
+                {
+                    return GetDriverPlatformType(DriverType);
+                }                
             } 
         }
 
@@ -751,7 +910,10 @@ namespace GingerCore
                 case eDriverType.MobileAppiumAndroid:
                 case eDriverType.MobileAppiumIOS:
                 //Add Perfecto Mobile
-                case eDriverType.PerfectoMobile:
+                case eDriverType.PerfectoMobileAndroid:
+                case eDriverType.PerfectoMobileAndroidWeb:
+                case eDriverType.PerfectoMobileIOS:
+                case eDriverType.PerfectoMobileIOSWeb:
                     return ePlatformType.Mobile;
                 case eDriverType.MobileAppiumAndroidBrowser:
                 case eDriverType.MobileAppiumIOSBrowser:
@@ -765,7 +927,7 @@ namespace GingerCore
                 case eDriverType.MainFrame3270:
                     return ePlatformType.MainFrame;
                 case eDriverType.AndroidADB:
-                    return ePlatformType.AndroidDevice;
+                    return ePlatformType.AndroidDevice;               
                 default:
                     return ePlatformType.NA;
             }                
@@ -794,7 +956,10 @@ namespace GingerCore
             {
                 driverTypes.Add(Agent.eDriverType.MobileAppiumAndroid);
                 driverTypes.Add(Agent.eDriverType.MobileAppiumIOS);
-                driverTypes.Add(Agent.eDriverType.PerfectoMobile);
+                driverTypes.Add(Agent.eDriverType.PerfectoMobileAndroid);
+                driverTypes.Add(Agent.eDriverType.PerfectoMobileAndroidWeb);
+                driverTypes.Add(Agent.eDriverType.PerfectoMobileIOS);
+                driverTypes.Add(Agent.eDriverType.PerfectoMobileIOSWeb);
                 driverTypes.Add(Agent.eDriverType.MobileAppiumAndroidBrowser);
                 driverTypes.Add(Agent.eDriverType.MobileAppiumIOSBrowser);
             }
@@ -836,7 +1001,7 @@ namespace GingerCore
             else if (platformType == ePlatformType.MainFrame.ToString())
             {
                 driverTypes.Add(Agent.eDriverType.MainFrame3270);
-            }
+            }           
             else
             {
                 driverTypes.Add(Agent.eDriverType.NA);
@@ -921,6 +1086,7 @@ namespace GingerCore
             //BusinessFlow = App.BusinessFlow; ;
             //SolutionFolder = App.UserProfile.Solution.Folder;
             //DSList = WorkSpace.Instance.SolutionRepository.GetAllRepositoryItems<DataSourceBase>();
+            SolutionFolder =WorkSpace.Instance.SolutionRepository.SolutionFolder;
             try
             {
                 StartDriver();
@@ -946,7 +1112,7 @@ namespace GingerCore
         }
 
         public object Tag;
-
+       
         public override eImageType ItemImageType
         {
             get

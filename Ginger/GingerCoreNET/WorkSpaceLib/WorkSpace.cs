@@ -56,7 +56,7 @@ namespace amdocs.ginger.GingerCoreNET
             {
                 if (mPluginsManager == null)
                 {
-                    mPluginsManager = new PluginsManager();
+                    mPluginsManager = new PluginsManager(SolutionRepository);
                 }
                 return mPluginsManager;
             }
