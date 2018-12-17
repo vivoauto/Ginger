@@ -51,7 +51,7 @@ namespace GingerCoreNET.GeneralLib
             }
         }
 
-        public void AddSolutionToRecent(Solution loadedSolution)
+        public void AddSolutionToRecent(ISolution loadedSolution)
         {
             //remove existing similar folder path
             string solPath = RecentSolutions.Where(x => SolutionRepository.NormalizePath(x) == SolutionRepository.NormalizePath(loadedSolution.Folder)).FirstOrDefault();

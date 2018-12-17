@@ -23,9 +23,9 @@ using System.Linq;
 using System.Reflection;
 using amdocs.ginger.GingerCoreNET;
 using Amdocs.Ginger.Common;
-using Amdocs.Ginger.Common.GeneralLib;
 using Amdocs.Ginger.Repository;
 using Ginger.UserConfig;
+using GingerCore;
 using GingerCoreNET.GeneralLib;
 using GingerCoreNET.ReporterLib;
 using GingerCoreNET.SolutionRepositoryLib.RepositoryObjectsLib.PlatformsLib;
@@ -244,9 +244,9 @@ namespace Ginger
         [IsSerializedForLocalRepository]
         public string EncryptedALMPassword { get; set; }
 
-        GingerCore.eTerminologyType mTerminologyType;
+        eTerminologyType mTerminologyType;
         [IsSerializedForLocalRepository]
-        public GingerCore.eTerminologyType TerminologyDictionaryType
+        public eTerminologyType TerminologyDictionaryType
         {
             get { return mTerminologyType; }
             set { mTerminologyType = value; OnPropertyChanged(nameof(TerminologyDictionaryType)); }
@@ -260,9 +260,9 @@ namespace Ginger
             set { mAppLogLevel = value; Reporter.CurrentAppLogLevel = mAppLogLevel; OnPropertyChanged(nameof(AppLogLevel)); }
         }
 
-        eUserType mUserType;
+        GingerCore.eUserType mUserType;
         [IsSerializedForLocalRepository]
-        public eUserType UserType
+        public GingerCore.eUserType UserType
         { 
             get
             {
@@ -430,11 +430,11 @@ namespace Ginger
             switch (dictObj["UserType"])
             {
                 case "Regular":
-                    UserType = eUserType.Regular;
+                    UserType = GingerCore.eUserType.Regular;
                     break;
 
                 case "Business":
-                    UserType = eUserType.Business;
+                    UserType = GingerCore.eUserType.Business;
                     break;
             }
 
@@ -649,5 +649,11 @@ namespace Ginger
             }
         }
 
+        public int SolutionSourceControlTimeout { get; set; }
+
+        public void AddSolutionToRecent(Ginger.SolutionGeneral.Solution sol)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
