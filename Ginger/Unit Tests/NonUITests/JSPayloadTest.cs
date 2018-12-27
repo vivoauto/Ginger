@@ -41,7 +41,7 @@ namespace UnitTests.NonUITests
         [TestInitialize]
         public void TestInitialize()
         {
-            mDriver = new SeleniumDriver(SeleniumDriver.eBrowserType.Chrome);//having Firefox issue on CMI server
+            mDriver = new SeleniumDriver(SeleniumDriver.eBrowserType.IE);//having Firefox issue on CMI server
             mDriver.StartDriver();
 
             ActGotoURL a = new ActGotoURL();

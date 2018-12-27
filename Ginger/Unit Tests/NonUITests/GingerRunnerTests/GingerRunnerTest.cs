@@ -64,7 +64,7 @@ namespace UnitTests.NonUITests.GingerRunnerTests
 
             Agent a = new Agent();
             //a.DriverType = Agent.eDriverType.SeleniumFireFox;//have known firefox issues with selenium 3
-            a.DriverType = Agent.eDriverType.SeleniumChrome;
+            a.DriverType = Agent.eDriverType.SeleniumIE;
 
             mGR.SolutionAgents = new ObservableList<Agent>();
             mGR.SolutionAgents.Add(a);

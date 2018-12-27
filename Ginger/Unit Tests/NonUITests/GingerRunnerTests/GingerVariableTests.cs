@@ -61,7 +61,7 @@ namespace UnitTests.NonUITests.GingerRunnerTests
             mGR.CurrentSolution = new Ginger.SolutionGeneral.Solution();
 
             Agent a = new Agent();
-            a.DriverType = Agent.eDriverType.SeleniumChrome;
+            a.DriverType = Agent.eDriverType.SeleniumIE;
 
             mGR.SolutionAgents = new ObservableList<Agent>();
             mGR.SolutionAgents.Add(a);
